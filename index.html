@@ -1,778 +1,1188 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>CBSE Result Analyzer: from Subbiah Goundar</title>
-<style>
-  :root {
-    --bg: #f4f7fb;
-    --card: #ffffff;
-    --ink: #1f2937;
-    --muted: #6b7280;
-    --accent: #2563eb;
-    --accent2: #14b8a6;
-    --border: #dbe4f0;
-    --good: #16a34a;
-    --warn: #d97706;
-    --bad: #dc2626;
-    --shadow: 0 8px 24px rgba(15,23,42,.08);
-    --radius: 18px;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    color: var(--ink);
-    background: linear-gradient(180deg,#eef4ff 0%,#f9fbff 30%,#f4f7fb 100%);
-  }
-  .wrap { max-width: 1400px; margin: 0 auto; padding: 20px; }
-  .hero {
-    background: linear-gradient(135deg,#1d4ed8,#0f766e);
-    color: white;
-    padding: 24px;
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-  }
-  .hero h1 { margin: 0 0 8px; font-size: 30px; }
-  .hero p { margin: 6px 0; opacity: .95; }
-  .upload-box {
-    margin-top: 18px;
-    display: grid;
-    gap: 14px;
-    grid-template-columns: 1.4fr .9fr;
-  }
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-  }
-  .panel { padding: 18px; }
-  .controls {
-    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
-  }
-  input[type=file] {
-    padding: 10px;
-    border: 1px dashed #c7d2fe;
-    border-radius: 12px;
-    background: #f8fbff;
-    width: 100%;
-  }
-  button, .btn {
-    border: none;
-    background: var(--accent);
-    color: #fff;
-    padding: 10px 16px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-  button.secondary { background: #475569; }
-  button.green { background: var(--good); }
-  button.teal { background: var(--accent2); }
-  button:disabled { opacity: .5; cursor: not-allowed; }
-  .meta-grid {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0,1fr));
-    gap: 14px;
-    margin: 18px 0;
-  }
-  .stat {
-    padding: 16px;
-    border-radius: 18px;
-    background: white;
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-  }
-  .stat .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
-  .stat .value { font-size: 28px; font-weight: 700; margin-top: 6px; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-  .section-title { font-size: 20px; margin: 0 0 12px; }
-  .muted { color: var(--muted); }
-  .hidden { display: none !important; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-    background: white;
-    overflow: hidden;
-  }
-  th, td {
-    padding: 9px 10px;
-    border-bottom: 1px solid #edf2f7;
-    text-align: left;
-    vertical-align: top;
-  }
-  th {
-    position: sticky;
-    top: 0;
-    background: #f8fafc;
-    z-index: 1;
-  }
-  .table-wrap { max-height: 440px; overflow: auto; border-radius: 14px; border: 1px solid var(--border); }
-  .chip {
-    display: inline-block;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 700;
-  }
-  .chip.pass { background: #dcfce7; color: #166534; }
-  .chip.comp { background: #fef3c7; color: #92400e; }
-  .chip.er { background: #fee2e2; color: #991b1b; }
-  .chip.abst { background: #e5e7eb; color: #374151; }
-  .bars { display: grid; gap: 10px; }
-  .bar-row { display: grid; grid-template-columns: 180px 1fr 70px; gap: 10px; align-items: center; }
-  .bar {
-    width: 100%; height: 16px; background: #e5eefb; border-radius: 999px; overflow: hidden;
-  }
-  .bar > span {
-    display: block; height: 100%;
-    background: linear-gradient(90deg,#3b82f6,#14b8a6);
-    border-radius: 999px;
-  }
-  .small { font-size: 12px; }
-  .footer-note { margin-top: 10px; font-size: 12px; color: var(--muted); }
-  .report-block { margin-top: 18px; }
-  .stream-card {
-    padding: 14px;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    background: linear-gradient(180deg,#fff,#fbfdff);
-  }
-  .stream-card h3 { margin: 0 0 8px; }
-  @media (max-width: 1100px) {
-    .meta-grid, .grid-2, .grid-3, .upload-box { grid-template-columns: 1fr; }
-    .bar-row { grid-template-columns: 120px 1fr 60px; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CBSE Result Analyzer</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    :root {
+      --bg:#f0f4fb; --panel:#f1f5f9; --text:#1e293b; --muted:#64748b; --line:#e2e8f0;
+      --ac1:#0f766e; --ac2:#1d4ed8; --ac3:#7c3aed;
+      --sci:#0284c7; --com:#15803d; --art:#c2410c; --voc:#7c3aed; --oth:#475569;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+    .wrap{max-width:1240px;margin:0 auto;padding:24px 16px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
+    h1{font-size:1.55rem;margin-bottom:4px}
+    h2{font-size:1.15rem;margin-bottom:14px;color:var(--text)}
+    h3{font-size:.95rem;margin-bottom:10px;color:var(--text)}
+    .subtitle{color:var(--muted);font-size:.85rem;margin-bottom:18px}
+    /* upload row */
+    .upload-row{display:grid;grid-template-columns:2.5fr 2fr 1fr 1fr;gap:12px;align-items:end}
+    label{display:block;margin-bottom:5px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+    input[type=file]{width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--line);font:inherit;background:#fff;cursor:pointer}
+    button{width:100%;padding:10px 14px;border-radius:10px;border:none;font:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s}
+    button:hover{opacity:.88}
+    button:disabled{opacity:.4;cursor:not-allowed}
+    .btn-green{background:var(--ac1);color:#fff}
+    .btn-blue{background:var(--ac2);color:#fff}
+    .btn-purple{background:var(--ac3);color:#fff}
+    .btn-red{background:#dc2626;color:#fff}
+    .btn-slate{background:#475569;color:#fff}
+    /* badge */
+    .badge{display:inline-block;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:600}
+    .badge-10{background:#dbeafe;color:#1e40af}
+    .badge-12{background:#ede9fe;color:#5b21b6}
+    .badge-err{background:#fee2e2;color:#991b1b}
+    /* status */
+    .status{margin-top:10px;font-size:13px;min-height:18px}
+    .status.ok{color:#15803d}
+    .status.err{color:#b91c1c;font-weight:600}
+    .status.warn{color:#9a3412}
+    /* KPIs */
+    .kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+    .kpi{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
+    .kpi .kl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+    .kpi .kv{font-size:26px;font-weight:700}
+    .kpi.kpass .kv{color:#16a34a}
+    .kpi.kcomp .kv{color:#eab308}
+    .kpi.ker   .kv{color:#dc2626}
+    .kpi.kabs  .kv{color:#6b7280}
+    .rs-pass{color:#16a34a;font-weight:700}
+    .rs-comp{color:#eab308;font-weight:700}
+    .rs-er{color:#dc2626;font-weight:700}
+    .rs-abs{color:#6b7280;font-weight:700}
+    /* export row */
+    .export-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px}
+    /* chart grid */
+    .chart-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+    .chart-grid-1{display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:18px}
+    .chart-box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+    .chart-box canvas{max-height:250px}
+    /* two-column layout */
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    /* tables */
+    .tbl-wrap{overflow:auto;max-height:420px;border:1px solid var(--line);border-radius:10px}
+    table{width:100%;border-collapse:collapse;font-size:12.5px}
+    th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;white-space:nowrap}
+    th{background:#f8fafc;position:sticky;top:0;z-index:1;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#f1f5f9}
+    /* stream cards */
+    .stream-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:16px}
+    .sc{border-radius:12px;padding:14px;color:#fff}
+    .sc.sci{background:var(--sci)}.sc.com{background:var(--com)}.sc.art{background:var(--art)}.sc.voc{background:var(--voc)}.sc.oth{background:var(--oth)}
+    .sc .sn{font-size:12px;opacity:.85;margin-bottom:4px}.sc .sv{font-size:24px;font-weight:700}.sc .ss{font-size:11px;opacity:.8;margin-top:2px}
+    /* tabs */
+    .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+    .tb{padding:6px 16px;border-radius:20px;border:1px solid var(--line);background:var(--bg);color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;width:auto;transition:all .15s}
+    .tb.act{color:#fff;border-color:transparent}
+    .tb.sci.act{background:var(--sci)}.tb.com.act{background:var(--com)}.tb.art.act{background:var(--art)}.tb.voc.act{background:var(--voc)}.tb.oth.act{background:var(--oth)}
+    .tp{display:none}.tp.act{display:block}
+    .hidden{display:none}
+    @media(max-width:880px){.upload-row,.kpis,.stream-cards,.chart-grid-2,.export-row,.grid2{grid-template-columns:1fr}}
+    @media print{
+      @page { margin: 16mm 10mm 18mm 10mm; }
+      body{background:#fff !important; position:relative; padding-bottom:26mm}
+      button,.export-row{display:none}
+      body::after{
+        content:"Powerd by SUBBIAH's CBSE RESULT ANALYSER 2026";
+        position:fixed;
+        left:0;
+        right:0;
+        bottom:8mm;
+        text-align:center;
+        font-size:11px;
+        font-weight:800;
+        color:#dc2626;
+        pointer-events:none;
+      }
+    }
+  </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="hero">
-    <h1>CBSE Result Analyzer from Subbiah Goundar-Beta</h1>
-    <p>Upload a CBSE result.TXT file, detect Class 10 or Class 12 automatically, analyze results, and export report tables.</p>
-    <p class="small">Class 12 is detected when the title contains <strong>CERTIFICATE</strong>. Subject codes for both classes are embedded.</p>
-    <div class="upload-box">
-      <div class="card panel">
-        <div class="controls">
-          <input id="fileInput" type="file" accept=".txt,.TXT" />
-          <button id="analyzeBtn">Analyze File</button>
-</div>
-        <div class="footer-note">Outputs include overall summary, subject-wise analysis, top 10 by percentage, stream-wise Class 12 analysis, full student table, Excel export, and report download.</div>
+
+  <!-- Upload Panel -->
+  <div class="card">
+    <h1>CBSE Result Analyzer</h1>
+    <p class="subtitle">Upload a CBSE gazette TXT file — class level (10 / 12) is auto-detected from the exam title.</p>
+    <div class="upload-row">
+      <div>
+        <label for="txtFile">CBSE Gazette TXT File</label>
+        <input id="txtFile" type="file" accept=".txt,.TXT">
       </div>
-      <div class="card panel">
-        <div><strong>Detection rules</strong></div>
-        <div class="small muted" style="margin-top:8px; line-height:1.5">
-          • Title contains CERTIFICATE → Class 12<br/>
-          • Otherwise → Class 10<br/>
-          • Science: Physics + Chemistry present<br/>
-          • Commerce: Business Studies + Accountancy present<br/>
-          • Arts: History + Political Science present<br/>
-          • Vocational: skill/vocational subject patterns or vocational code groups
-        </div>
+      <div style="display:flex;align-items:center;gap:8px;padding-top:22px">
+        <span style="font-size:12px;color:var(--muted)">Detected:</span>
+        <span id="detBadge" class="badge" style="display:none"></span>
+        <span id="detWait" style="font-size:12px;color:var(--muted)">awaiting file…</span>
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button id="goBtn" class="btn-green" disabled>Analyse</button>
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <button id="resetBtn" class="btn-slate">Reset</button>
       </div>
     </div>
+    <div id="statusEl" class="status"></div>
+    <div id="warnEl"   class="status warn"></div>
   </div>
 
-  <div id="reportRoot" class="hidden">
-    <div class="meta-grid" id="metaCards"></div>
+  <!-- Results -->
+  <div id="resultArea" class="hidden">
 
-    <div class="grid-2">
-      <div class="card panel">
-        <h2 class="section-title">Result Distribution</h2>
-        <div id="resultBars" class="bars"></div>
-      </div>
-      <div class="card panel">
-        <h2 class="section-title">Gender Distribution</h2>
-        <div id="genderBars" class="bars"></div>
+    <!-- Header Meta + KPIs -->
+    <div class="card">
+      <h2 id="examTitle">Exam</h2>
+      <p id="meta" style="color:var(--muted);font-size:12.5px;margin-bottom:14px"></p>
+      <div class="kpis" id="kpis"></div>
+    </div>
+
+    <!-- Exports -->
+    <div class="card export-row">
+      <button id="excelBtn" class="btn-green">&#8681; Download Excel</button>
+      <button id="pdfBtn"   class="btn-blue">&#8681; Download PDF Report</button>
+      <button onclick="window.print()" class="btn-purple">&#128438; Print Page</button>
+      <button id="vocToggleBtn" class="btn-red">WITH VOCATIONAL</button>
+    </div>
+
+    <!-- Charts row 1 -->
+    <div class="chart-grid-1">
+      <div class="chart-box"><h3>Result Distribution</h3><canvas id="cBuckets"></canvas></div>
+    </div>
+
+    <!-- Charts row 2 -->
+    <div class="chart-grid-2">
+      <div class="chart-box"><h3>Subject-wise Average Marks (top 15 subjects)</h3><canvas id="cSubjAvg"></canvas></div>
+      <div class="chart-box"><h3>Top 10 Students — Best 5 %</h3><canvas id="cTop10"></canvas></div>
+    </div>
+
+    <!-- Top 10 Tables (overall) -->
+    <div class="card">
+      <h2>Top 10 Students (Overall)</h2>
+      <div class="grid2">
+        <div><h3>By All Subjects %</h3><div class="tbl-wrap"><table id="tTopAll"></table></div></div>
+        <div><h3>By Best 5 %</h3>     <div class="tbl-wrap"><table id="tTopBest"></table></div></div>
       </div>
     </div>
 
-    <div class="grid-2 report-block">
-      <div class="card panel">
-        <h2 class="section-title">Top 10 Students</h2>
-        <div class="table-wrap"><table id="top10Table"></table></div>
+    <!-- ===== CLASS 12 STREAM SECTION ===== -->
+    <div id="streamSection" class="card hidden">
+      <h2>Stream-wise Analysis (Class 12)</h2>
+      <div class="stream-cards" id="streamCards"></div>
+
+      <div class="chart-grid-2">
+        <div class="chart-box"><h3>Stream Distribution</h3><canvas id="cStreamDist"></canvas></div>
+        <div class="chart-box"><h3>Pass Rate by Stream</h3><canvas id="cStreamPass"></canvas></div>
       </div>
-      <div class="card panel">
-        <h2 class="section-title">Subject Performance</h2>
-        <div class="table-wrap"><table id="subjectTable"></table></div>
-      </div>
+
+      <div class="tabs" id="streamTabs"></div>
+      <div id="streamPanes"></div>
     </div>
 
-    <div id="streamSection" class="report-block hidden">
-      <div class="card panel">
-        <h2 class="section-title">Class 12 Stream-wise Analysis</h2>
-        <div id="streamCards" class="grid-3"></div>
-      </div>
+    <!-- Subject Summary -->
+    <div class="card">
+      <h2>Subject Summary</h2>
+      <div class="tbl-wrap"><table id="tSubject"></table></div>
     </div>
 
-    <div class="report-block card panel">
-      <div class="controls" style="justify-content:space-between; margin-bottom: 10px;">
-        <h2 class="section-title" style="margin:0">Full Student Report</h2>
-        <div class="controls">
-          <button id="downloadExcelBtn" class="green">Download Tables in Excel</button>
-          <button id="downloadReportBtn" class="teal">Download Entire Report (HTML)</button>
-          <button id="downloadStudentsCsvBtn" class="secondary">Download Student Table (CSV)</button>
-        </div>
-      </div>
-      <div class="table-wrap"><table id="studentTable"></table></div>
-      <div class="footer-note">Percentage shown here is Best 5 average × 100. This works consistently when six subjects are present.</div>
+    <!-- Student Master -->
+    <div class="card">
+      <h2>Student Master</h2>
+      <div class="tbl-wrap"><table id="tStudents"></table></div>
     </div>
-  </div>
-</div>
+
+  </div><!-- /resultArea -->
+</div><!-- /wrap -->
 
 <script>
-const SUBJECT_MAP = {"10": {"2": "HINDI COURSE - A", "85": "HINDI COURSE - B", "101": "ENGLISH (COMMUNICATIVE)", "184": "ENGLISH (LANG & LIT)", "3": "URDU COURSE-A", "303": "URDU COURSE-B", "4": "PUNJABI", "5": "BENGALI", "6": "TAMIL", "7": "TELUGU", "89": "TELUGU-TELANGANA", "8": "SINDHI", "9": "MARATHI", "10": "GUJARATI", "11": "MANIPURI", "12": "MALAYALAM", "13": "ODIA", "14": "ASSAMESE", "15": "KANNADA", "16": "ARABIC", "17": "TIBETAN", "18": "FRENCH", "20": "GERMAN", "21": "RUSSIAN", "23": "PERSIAN", "24": "NEPALI", "25": "LIMBOO", "26": "LEPCHA", "88": "BHOTI", "91": "KOKBOROK", "92": "BODO", "93": "TANGKHUL", "94": "JAPANESE", "95": "BHUTIA", "96": "SPANISH", "97": "KASHMlRI", "98": "MIZO", "99": "BAHASA MELAYU", "119": "SANSKRIT (COMMUNICATIVE)", "122": "SANSKRIT", "131": "RAI", "132": "GURUNG", "133": "TAMANG", "134": "SHERPA", "136": "THAI", "41": "MATHEMATICS (STANDARD)", "241": "MATHEMATICS( BASIC)", "86": "SCIENCE", "87": "SOCIAL SCIENCE", "31": "CAR. MUSIC (VOCAL)", "32": "CAR. MUSIC MEL. INS.", "33": "CAR. MUSIC PER. INS.", "34": "HIND.MUSIC (VOCAL)", "35": "HIND.MUSIC MEL. INS.", "36": "HIND.MUSIC PER. INS.", "49": "PAINTING", "64": "HOME SCIENCE", "76": "NATIONAL CADET CORPS (NCC)", "154": "ELEMENTS OF BUSINESS", "254": "ELEMENTS OF BOOK KEEPING &\nACCOUNT", "165": "COMPUTER APPLICATIONS", "401": "RETAIL", "403": "SECURITY", "402": "INFORMATION  TECHNOLOGY", "417": "ARTIFICIAL INTELLIGENCE", "404": "AUTOMOTIVE", "405": "INTRODUCTION TO  FINANCIAL MARKETS", "406": "INTRODUCTION TO TOURISM", "407": "BEAUTY & WELLNESS", "408": "AGRICULTURE", "409": "FOOD PRODUCTION", "410": "FRONT OFFICE OPERATIONS", "411": "BANKING & INSURANCE", "412": "MARKETING & SALES", "413": "HEALTH CARE", "414": "APPAREL", "415": "MULTIMEDIA", "416": "MULTI SKILL FOUNDATION COURSE", "418": "PHYSICAL ACTIVITY TRAINER", "419": "DATA SCIENCE", "420": "ELECTRONICS & HARDWARE", "421": "FOUNDATION SKILL FOR SCIENCES (PHARMACEUTICAL & BIOTECHNOLOGY)", "422": "DESIGN THINKING & INNOVATION"}, "12": {"1": "ENGLISH ELECTIVE", "301": "ENGLISH CORE", "2": "HINDI ELECTIVE", "302": "HINDICORE", "3": "URDU ELECTIVE", "303": "URDU CORE", "22": "SANSKRIT ELECTIVE", "322": "SANSKRIT CORE", "104": "PUNJABI", "105": "BENGALI", "106": "TAMIL", "107": "TELUGU", "189": "TELUGU TELANGANA", "108": "SINDHI", "109": "MARATHI", "110": "GUJARATI", "111": "MANIPURI", "112": "MALAYALAM", "113": "ODIA", "114": "ASSAMESE", "115": "KANNADA", "116": "ARABIC", "117": "TIBETAN", "118": "FRENCH", "120": "GERMAN", "121": "RUSSIAN", "123": "PERSIAN", "124": "NEPALI", "125": "LIMBOO", "126": "LEPCHA", "188": "BHOTI", "191": "KOKBOROK", "192": "BODO", "193": "TANGKHUL", "194": "JAPANESE", "195": "BHUTIA", "196": "SPANISH", "197": "KASHMlRI", "198": "MIZO", "27": "HISTORY", "28": "POLITICAL SCIENCE", "29": "GEOGRAPHY", "30": "ECONOMICS", "31": "CAR. MUSIC VOCAL", "32": "CAR. MUSIC MEL INS", "33": "CAR. MUSIC PER INS MRI DANGAM HIND.MUSIC.VOCAL", "34": "HIND.MUSIC.VOCAL", "35": "HIND. MUSIC MEL INS.", "36": "HIND. PER INS.", "37": "PSYCHOLOGY", "39": "SOCIOLOGY", "41": "MATHEMATICS", "241": "APPLIED MATHEMATICS", "42": "PHYSICS", "43": "CHEMISTRY", "44": "BIOLOGY", "45": "BIOTECHNOLOGY", "46": "ENGG. GRAPHICS", "48": "PHYSICAL EDUCATION", "49": "PAINTING", "50": "GRAPHICS", "51": "SCULPTURE", "52": "APP/COMMERCIAL ART", "54": "BUSINESS STUDIES", "55": "ACCOUNTANCY", "56": "KATHAK - DANCE", "57": "BHARATNATYAM  - DANCE", "58": "KUCHIPUDI - DANCE", "59": "ODISSI - DANCE", "60": "MANIPURI - DANCE", "61": "KATHAKALI - DANCE", "64": "HOME SCIENCE", "65": "INFORMATICS PRACTICE", "83": "COMPUTER  SCIENCE", "66": "ENTREPRENEURSHIP", "73": "KNOWLEDGE TRADITION & PRACT OF INDIA", "74": "LEGAL STUDIES", "76": "NATIONAL CADET CORPS (NCC)", "801": "RETAIL", "802": "INFORMATION TECHNOLOGY", "803": "WEB APPLICATION", "804": "AUTOMOTIVE", "805": "FINANCIAL MARKETS MANAGEMENT", "806": "TOURISM", "807": "BEAUTY & WELLNESS", "808": "AGRICULTURE", "809": "FOOD PRODUCTION", "810": "FRONT OFFICE OPERATIONS", "811": "BANKING", "812": "MARKETING", "813": "HEALTH CARE", "814": "INSURANCE", "816": "HORTICULTURE", "817": "TYPOGRAPHY & COMPUTER APPLICATION", "818": "GEOSPATIAL  TECHNOLOGY", "819": "ELECTRICAL TECHNOLOGY", "820": "ELECTRONIC TECHNOLOGY", "821": "MULTIMEDIA", "822": "TAXATION", "823": "COST ACCOUNTI NG", "824": "OFFICE PROCEDURES & PRACTICES", "825": "SHORTHAND (ENGLISH)", "826": "SHORTHAND (HINDI)", "827": "AIR-CONDITIONING & REFRIGERATION", "828": "MEDICAL DIAGNOSTICS", "829": "TEXTILE DESIGN", "830": "DESIGN", "831": "SALESMANSHI P", "833": "BUSINESS  ADMINISTRATION", "834": "FOOD NUTRITION & DIETETICS", "835": "MASS MEDIA STUDIES", "836": "LIBRARY & INFORMATION SCIENCE", "837": "FASHION STUDIES", "841": "YOGA", "842": "EARLY CHILDHOOD CARE & EDUCATION", "843": "ARTIFICIAL INTELLIGENCE", "844": "DATA SCIENCE", "845": "PHYSICALACTIVITY TRAINER", "846": "LAND TRANSPORTATION ASSOCIATE", "847": "ELECTRONICSAND  HARDWARE", "848": "DESIGN THINKING AND INNOVATION"}};
-let currentData = null;
-
-function normalizeSpaces(s) {
-  return s.replace(/\u001a/g,'').replace(/\r/g,'').replace(/\t/g,' ').replace(/ +/g,' ').trim();
-}
-
-function detectClass(text) {
-  return /CERTIFICATE/i.test(text) ? 12 : 10;
-}
-
-function getSubjectName(cls, code) {
-  const key = String(parseInt(code, 10));
-  return (SUBJECT_MAP[String(cls)] && SUBJECT_MAP[String(cls)][key]) || key;
-}
-
-function safeNumber(v) {
-  const n = Number(v);
-  return Number.isFinite(n) ? n : 0;
-}
-
-function pct(num, den) {
-  return den ? ((num / den) * 100) : 0;
-}
-
-function chipClass(status) {
-  const s = String(status || '').toUpperCase();
-  if (s === 'PASS') return 'pass';
-  if (s === 'COMP') return 'comp';
-  if (s === 'ESSENTIAL REPEAT') return 'er';
-  return 'abst';
-}
-
-function statusLabel(status) {
-  return `<span class="chip ${chipClass(status)}">${status}</span>`;
-}
-
-function parseRecordLine(line, cls) {
-  const statuses = ['ESSENTIAL REPEAT', 'COMP', 'ABST', 'PASS'];
-  const clean = normalizeSpaces(line);
-  if (!/^\d{8}\b/.test(clean)) return null;
-
-  let foundStatus = null;
-  let pos = -1;
-  for (const st of statuses) {
-    const idx = clean.lastIndexOf(st);
-    if (idx !== -1) {
-      foundStatus = st;
-      pos = idx;
-      break;
-    }
+/* ============================================================
+   SUBJECT MASTER — Class 10 & 12
+   ============================================================ */
+const SUBJECTS = {
+  10: {
+    2:'HINDI COURSE-A', 85:'HINDI COURSE-B', 101:'ENGLISH COMMUNICATIVE', 184:'ENGLISH LANG & LIT',
+    3:'URDU COURSE-A', 303:'URDU COURSE-B', 4:'PUNJABI', 5:'BENGALI', 6:'TAMIL', 7:'TELUGU',
+    89:'TELUGU TELANGANA', 8:'SINDHI', 9:'MARATHI', 10:'GUJARATI', 11:'MANIPURI', 12:'MALAYALAM',
+    13:'ODIA', 14:'ASSAMESE', 15:'KANNADA', 16:'ARABIC', 17:'TIBETAN', 18:'FRENCH', 20:'GERMAN',
+    21:'RUSSIAN', 23:'PERSIAN', 24:'NEPALI', 25:'LIMBOO', 26:'LEPCHA', 88:'BHOTI', 91:'KOKBOROK',
+    92:'BODO', 93:'TANGKHUL', 94:'JAPANESE', 95:'BHUTIA', 96:'SPANISH', 97:'KASHMIRI', 98:'MIZO',
+    99:'BAHASA MELAYU', 119:'SANSKRIT COMMUNICATIVE', 122:'SANSKRIT', 131:'RAI', 132:'GURUNG',
+    133:'TAMANG', 134:'SHERPA', 136:'THAI', 41:'MATHEMATICS (STANDARD)', 241:'MATHEMATICS (BASIC)',
+    86:'SCIENCE', 87:'SOCIAL SCIENCE',
+    31:'CARNATIC MUSIC VOCAL', 32:'CARNATIC MUSIC MEL INS', 33:'CARNATIC MUSIC PER INS',
+    34:'HINDUSTANI MUSIC VOCAL', 35:'HINDUSTANI MUSIC MEL INS', 36:'HINDUSTANI MUSIC PER INS',
+    49:'PAINTING', 64:'HOME SCIENCE', 76:'NCC',
+    154:'ELEMENTS OF BUSINESS', 254:'ELEMENTS OF BOOK KEEPING & ACCOUNTANCY',
+    165:'COMPUTER APPLICATIONS',
+    401:'RETAIL', 402:'INFORMATION TECHNOLOGY', 403:'SECURITY', 404:'AUTOMOTIVE',
+    405:'INTRO TO FINANCIAL MARKETS', 406:'INTRO TO TOURISM', 407:'BEAUTY & WELLNESS',
+    408:'AGRICULTURE', 409:'FOOD PRODUCTION', 410:'FRONT OFFICE OPERATIONS',
+    411:'BANKING & INSURANCE', 412:'MARKETING & SALES', 413:'HEALTH CARE', 414:'APPAREL',
+    415:'MULTIMEDIA', 416:'MULTI SKILL FOUNDATION', 417:'ARTIFICIAL INTELLIGENCE',
+    418:'PHYSICAL ACTIVITY TRAINER', 419:'DATA SCIENCE', 420:'ELECTRONICS & HARDWARE',
+    421:'FOUNDATION SKILL SCIENCES', 422:'DESIGN THINKING & INNOVATION'
+  },
+  12: {
+    1:'ENGLISH ELECTIVE', 301:'ENGLISH CORE', 2:'HINDI ELECTIVE', 302:'HINDI CORE',
+    3:'URDU ELECTIVE', 303:'URDU CORE', 22:'SANSKRIT ELECTIVE', 322:'SANSKRIT CORE',
+    104:'PUNJABI', 105:'BENGALI', 106:'TAMIL', 107:'TELUGU', 189:'TELUGU TELANGANA',
+    108:'SINDHI', 109:'MARATHI', 110:'GUJARATI', 111:'MANIPURI', 112:'MALAYALAM',
+    113:'ODIA', 114:'ASSAMESE', 115:'KANNADA', 116:'ARABIC', 117:'TIBETAN', 118:'FRENCH',
+    120:'GERMAN', 121:'RUSSIAN', 123:'PERSIAN', 124:'NEPALI', 125:'LIMBOO', 126:'LEPCHA',
+    188:'BHOTI', 191:'KOKBOROK', 192:'BODO', 193:'TANGKHUL', 194:'JAPANESE', 195:'BHUTIA',
+    196:'SPANISH', 197:'KASHMIRI', 198:'MIZO',
+    27:'HISTORY', 28:'POLITICAL SCIENCE', 29:'GEOGRAPHY', 30:'ECONOMICS',
+    31:'CARNATIC MUSIC VOCAL', 32:'CARNATIC MUSIC MEL INS', 33:'CARNATIC MUSIC PER INS',
+    34:'HINDUSTANI MUSIC VOCAL', 35:'HINDUSTANI MUSIC MEL INS', 36:'HINDUSTANI MUSIC PER INS',
+    37:'PSYCHOLOGY', 39:'SOCIOLOGY', 41:'MATHEMATICS', 241:'APPLIED MATHEMATICS',
+    42:'PHYSICS', 43:'CHEMISTRY', 44:'BIOLOGY', 45:'BIOTECHNOLOGY', 46:'ENGINEERING GRAPHICS',
+    48:'PHYSICAL EDUCATION', 49:'PAINTING', 50:'GRAPHICS', 51:'SCULPTURE',
+    52:'APP COMMERCIAL ART', 54:'BUSINESS STUDIES', 55:'ACCOUNTANCY',
+    56:'KATHAK DANCE', 57:'BHARATNATYAM DANCE', 58:'KUCHIPUDI DANCE', 59:'ODISSI DANCE',
+    60:'MANIPURI DANCE', 61:'KATHAKALI DANCE', 64:'HOME SCIENCE',
+    65:'INFORMATICS PRACTICE', 66:'ENTREPRENEURSHIP',
+    73:'KNOWLEDGE TRADITION & PRACT OF INDIA', 74:'LEGAL STUDIES', 76:'NCC', 83:'COMPUTER SCIENCE',
+    /* Vocational 800-series */
+    801:'RETAIL', 802:'INFORMATION TECHNOLOGY', 803:'WEB APPLICATION', 804:'AUTOMOTIVE',
+    805:'FINANCIAL MARKETS MANAGEMENT', 806:'TOURISM', 807:'BEAUTY & WELLNESS',
+    808:'AGRICULTURE', 809:'FOOD PRODUCTION', 810:'FRONT OFFICE OPERATIONS',
+    811:'BANKING', 812:'MARKETING', 813:'HEALTH CARE', 814:'INSURANCE',
+    816:'HORTICULTURE', 817:'TYPOGRAPHY & COMPUTER APPLICATION',
+    818:'GEOSPATIAL TECHNOLOGY', 819:'ELECTRICAL TECHNOLOGY', 820:'ELECTRONIC TECHNOLOGY',
+    821:'MULTIMEDIA', 822:'TAXATION', 823:'COST ACCOUNTING',
+    824:'OFFICE PROCEDURES & PRACTICES', 825:'SHORTHAND (ENGLISH)', 826:'SHORTHAND (HINDI)',
+    827:'AIR-CONDITIONING & REFRIGERATION', 828:'MEDICAL DIAGNOSTICS',
+    829:'TEXTILE DESIGN', 830:'DESIGN', 831:'SALESMANSHIP',
+    833:'BUSINESS ADMINISTRATION', 834:'FOOD NUTRITION & DIETETICS',
+    835:'MASS MEDIA STUDIES', 836:'LIBRARY & INFORMATION SCIENCE', 837:'FASHION STUDIES',
+    841:'YOGA', 842:'EARLY CHILDHOOD CARE & EDUCATION', 843:'ARTIFICIAL INTELLIGENCE',
+    844:'DATA SCIENCE', 845:'PHYSICAL ACTIVITY TRAINER',
+    846:'LAND TRANSPORTATION ASSOCIATE', 847:'ELECTRONICS AND HARDWARE',
+    848:'DESIGN THINKING AND INNOVATION'
   }
-  if (!foundStatus) return null;
+};
 
-  const prefix = clean.slice(0, pos).trim();
-  const suffix = clean.slice(pos + foundStatus.length).trim();
+/* ============================================================
+   STREAM DEFINITIONS (Class 12)
+   Detection order: VOCATIONAL first (any 800–899 code),
+   then SCIENCE (Physics 42 + Chemistry 43),
+   then COMMERCE (Business Studies 54 + Accountancy 55),
+   then ARTS (History 27 + Political Science 28),
+   else OTHER.
+   ============================================================ */
+const STREAMS = {
+  SCIENCE:    { label:'Science',    color:'#0284c7', cls:'sci' },
+  COMMERCE:   { label:'Commerce',   color:'#15803d', cls:'com' },
+  ARTS:       { label:'Arts',       color:'#c2410c', cls:'art' },
+  VOCATIONAL: { label:'Vocational', color:'#7c3aed', cls:'voc' },
+  OTHER:      { label:'Other',      color:'#475569', cls:'oth' }
+};
 
-  const parts = prefix.split(' ');
-  if (parts.length < 4) return null;
+function detectStream(student) {
+  const codes = student.subjects.map(s => s.code);
+  const has    = c => codes.includes(c);
+  if (codes.some(c => c >= 800 && c <= 899)) return 'VOCATIONAL';
+  if (has(42) && has(43))  return 'SCIENCE';
+  if (has(54) && has(55))  return 'COMMERCE';
+  if (has(27) && has(28))  return 'ARTS';
+  return 'OTHER';
+}
 
-  const roll = parts.shift();
-  const sex = parts.shift();
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  parsed: null,
+  subjectSummary: [],
+  resultBuckets:  {},
+  gradeDistribution: {},
+  topAll:  [],
+  topBest: [],
+  streamData: {},
+  includeVocationalInBest5: true
+};
+const _charts = {};   /* live Chart.js instances */
+
+/* ============================================================
+   DOM
+   ============================================================ */
+const $txtFile   = document.getElementById('txtFile');
+const $goBtn     = document.getElementById('goBtn');
+const $resetBtn  = document.getElementById('resetBtn');
+const $excelBtn  = document.getElementById('excelBtn');
+const $pdfBtn    = document.getElementById('pdfBtn');
+const $vocToggle = document.getElementById('vocToggleBtn');
+const $status    = document.getElementById('statusEl');
+const $warn      = document.getElementById('warnEl');
+const $results   = document.getElementById('resultArea');
+
+/* ============================================================
+   FILE SELECTION → auto-detect class
+   ============================================================ */
+$txtFile.addEventListener('change', async () => {
+  const badge  = document.getElementById('detBadge');
+  const wait   = document.getElementById('detWait');
+  badge.style.display = 'none';
+  wait.textContent    = 'reading…';
+  wait.style.display  = '';
+  $goBtn.disabled     = true;
+  $goBtn._cl          = null;
+  setStatus('', '');
+
+  if (!$txtFile.files.length) { wait.textContent = 'awaiting file…'; return; }
+  const text = await $txtFile.files[0].text();
+  try {
+    const cl = detectClass(text);
+    badge.textContent   = `Class ${cl} detected`;
+    badge.className     = `badge badge-${cl}`;
+    badge.style.display = 'inline-block';
+    wait.style.display  = 'none';
+    $goBtn.disabled     = false;
+    $goBtn._cl          = cl;
+  } catch(e) {
+    badge.textContent   = 'Unknown';
+    badge.className     = 'badge badge-err';
+    badge.style.display = 'inline-block';
+    wait.style.display  = 'none';
+    setStatus(e.message, 'err');
+  }
+});
+
+/* ============================================================
+   ANALYSE BUTTON
+   ============================================================ */
+$goBtn.addEventListener('click', async () => {
+  setStatus('', '');
+  $warn.innerHTML = '';
+  const file = $txtFile.files[0];
+  if (!file) { setStatus('Upload a TXT file first.', 'err'); return; }
+  const text = await file.text();
+  try {
+    const parsed = parseCbseText(text, $goBtn._cl, file.name);
+    state.parsed = parsed;
+    computeDerived();
+    renderAll();
+    setStatus(`✓ Parsed ${parsed.students.length} students successfully.`, 'ok');
+  } catch(err) {
+    $results.classList.add('hidden');
+    setStatus(err.message || String(err), 'err');
+  }
+});
+
+/* ============================================================
+   RESET
+   ============================================================ */
+$resetBtn.addEventListener('click', () => {
+  $txtFile.value = '';
+  state.parsed   = null;
+  $results.classList.add('hidden');
+  setStatus('', '');
+  $warn.innerHTML = '';
+  const badge = document.getElementById('detBadge');
+  const wait  = document.getElementById('detWait');
+  badge.style.display = 'none';
+  wait.textContent    = 'awaiting file…';
+  wait.style.display  = '';
+  $goBtn.disabled     = true;
+  $goBtn._cl          = null;
+  destroyCharts();
+});
+
+$excelBtn.addEventListener('click', () => { if (state.parsed) exportExcel(); });
+$pdfBtn.addEventListener('click',   async () => { if (state.parsed) await exportPdf(); });
+$vocToggle.addEventListener('click', () => {
+  state.includeVocationalInBest5 = !state.includeVocationalInBest5;
+  if (!state.parsed) return;
+  computeDerived();
+  renderAll();
+  setStatus(`Best 5 mode: ${state.includeVocationalInBest5 ? 'WITH VOCATIONAL' : 'WITHOUT VOCATIONAL'}`, 'ok');
+});
+
+function setStatus(msg, type) {
+  $status.textContent = msg;
+  $status.className   = 'status' + (type ? ' ' + type : '');
+}
+
+/* ============================================================
+   CLASS DETECTION
+   "CERTIFICATE" in title → Class 12
+   "SECONDARY SCHOOL EXAMINATION" → Class 10
+   ============================================================ */
+function detectClass(text) {
+  const u = text.toUpperCase();
+  if (u.includes('CERTIFICATE'))                    return 12;
+  if (u.includes('SECONDARY SCHOOL EXAMINATION'))   return 10;
+  throw new Error('Cannot detect class from file title. Is this a valid CBSE gazette?');
+}
+
+/* ============================================================
+   PARSER
+   ============================================================ */
+function parseCbseText(rawText, detectedClass, filename) {
+  const text  = rawText.replace(/\x1a/g, '').replace(/\f/g, '\n');
+  const lines = text.split(/\r?\n/).map(s => s.replace(/\s+$/g, ''));
+
+  const headerLine = lines.find(l => l.includes('C.B.S.E.')) || '';
+  const schoolLine = lines.find(l => /SCHOOL\s*:\s*-\s*\d+/.test(l)) || '';
+  const footerLine = [...lines].reverse().find(l => /TOTAL CANDIDATES\s*:/.test(l)) || '';
+
+  const hm = headerLine.match(/DATE:-\s*([0-9\/\-]+).*?C\.B\.S\.E\.\s*-\s*(.*?)\s+REGION:\s*([A-Z ]+?)\s+PAGE/i);
+  const sm = schoolLine.match(/SCHOOL\s*:\s*-\s*(\d+)\s+(.*)$/i);
+  const fm = footerLine.match(/TOTAL CANDIDATES\s*:\s*(\d+)\s+TOTAL PASS\s*:\s*(\d+)\s+TOTAL COMPTT\.\s*:\s*(\d+)\s+TOTAL ESSENTIAL REPEAT\s*:\s*(\d+)\s+TOTAL ABSENT\s*:\s*(\d+)/i);
+
+  const students = [], warnings = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!/^\d{8}\s+[MF]\s+/.test(line)) continue;
+    const res = parseStudentLine(line, (lines[i + 1] || '').trim(), detectedClass);
+    students.push(res.student);
+    warnings.push(...res.warnings);
+  }
+
+  if (!students.length) throw new Error('No student records found. Check that this is a valid CBSE gazette TXT.');
+  if (fm && +fm[1] !== students.length)
+    warnings.push(`Footer says ${fm[1]} candidates, but parsed ${students.length}.`);
+
+  return {
+    filename, detectedClass,
+    examDate:   hm ? hm[1] : '',
+    examTitle:  hm ? hm[2].trim() : '',
+    region:     hm ? hm[3].trim() : '',
+    schoolCode: sm ? sm[1] : '',
+    schoolName: sm ? sm[2].trim() : '',
+    totals: {
+      candidates:      fm ? +fm[1] : students.length,
+      pass:            fm ? +fm[2] : countByResult(students, 'PASS'),
+      comp:            fm ? +fm[3] : countByResult(students, 'COMP'),
+      essentialRepeat: fm ? +fm[4] : countByResult(students, 'ESSENTIAL REPEAT'),
+      absent:          fm ? +fm[5] : countByResult(students, 'ABST')
+    },
+    students, warnings
+  };
+}
+
+function parseStudentLine(recordLine, marksLine, classLevel) {
+  const m = recordLine.match(/^(\d{8})\s+([MF])\s+(.*?)\s{2,}(.*?)\s*$/);
+  if (!m) throw new Error(`Could not parse student row: ${recordLine}`);
+
+  const roll = m[1], gender = m[2], name = m[3].trim();
+  const tokens = m[4].trim().split(/\s+/);
+  const subjectCodes = [];
+  while (tokens.length && /^\d+$/.test(tokens[0]))
+    subjectCodes.push(Number(tokens.shift()));
 
   const internalGrades = [];
-  while (parts.length && /^(A1|A2|B1|B2|C1|C2|D1|D2|E)$/i.test(parts[parts.length - 1])) {
-    internalGrades.unshift(parts.pop().toUpperCase());
+  if (classLevel === 12) {
+    while (tokens.length && internalGrades.length < 3 && /^[A-E](?:1|2)?$/i.test(tokens[0]))
+      internalGrades.push(tokens.shift().toUpperCase());
   }
 
-  const subjectCodes = [];
-  while (parts.length && /^\d{2,3}$/.test(parts[parts.length - 1])) {
-    subjectCodes.unshift(parts.pop().padStart(3,'0'));
-  }
+  const compSubjects = [];
+  while (tokens.length && /^\d+$/.test(tokens[tokens.length - 1]))
+    compSubjects.unshift(Number(tokens.pop()));
 
-  const name = parts.join(' ').trim();
-  const compSubjects = suffix ? suffix.split(' ').filter(x => /^\d{2,3}$/.test(x)).map(x => x.padStart(3,'0')) : [];
+  const resultStatus = tokens.join(' ').trim().toUpperCase();
+  const pairs = parseMarksLine(marksLine);
+  const warnings = [];
+  if (pairs.length && pairs.length !== subjectCodes.length)
+    warnings.push(`Roll ${roll}: subject codes=${subjectCodes.length}, marks pairs=${pairs.length}`);
 
-  return { roll, sex, name, subjectCodes, result: foundStatus, compSubjects };
+  const subjects = subjectCodes.map((code, idx) => {
+    const p = pairs[idx] || { marks: null, grade: null };
+    return {
+      order: idx + 1, code,
+      name: SUBJECTS[classLevel]?.[code] || `Unknown (${code})`,
+      marks: p.marks, grade: p.grade,
+      isCompartment: compSubjects.includes(code)
+    };
+  });
+
+  const marks    = subjects.map(s => s.marks).filter(v => Number.isInteger(v));
+  const allTotal = marks.length ? marks.reduce((a, b) => a + b, 0) : null;
+  const allPct   = marks.length ? +(allTotal / marks.length).toFixed(2) : null;
+  const best     = [...marks].sort((a, b) => b - a).slice(0, Math.min(5, marks.length));
+  const bestTotal= best.length ? best.reduce((a, b) => a + b, 0) : null;
+  const bestPct  = best.length ? +(bestTotal / best.length).toFixed(2) : null;
+
+  return {
+    student: { roll, gender, name, resultStatus, internalGrades, compSubjects,
+               subjects, allTotal, allPct, bestTotal, bestPct },
+    warnings
+  };
 }
 
 function parseMarksLine(line) {
-  const clean = normalizeSpaces(line);
-  if (!clean) return [];
-  const toks = clean.split(' ');
-  const pairs = [];
-  for (let i = 0; i < toks.length - 1; i += 2) {
-    if (/^\d{1,3}$/.test(toks[i])) {
-      pairs.push({ marks: Number(toks[i]), grade: toks[i+1] || '' });
+  if (!line) return [];
+  const tokens = line.trim().split(/\s+/);
+  const pairs  = [];
+  for (let i = 0; i < tokens.length; i++) {
+    if (!/^\d+$/.test(tokens[i])) continue;
+    const marks = +tokens[i];
+    let grade = null;
+    if (i + 1 < tokens.length && !/^\d+$/.test(tokens[i + 1])) {
+      grade = tokens[i + 1].toUpperCase(); i++;
     }
+    pairs.push({ marks, grade });
   }
   return pairs;
 }
 
-function classifyStream(subjectCodes, cls) {
-  if (cls !== 12) return '';
-  const normalizedCodes = subjectCodes
-    .map(c => String(parseInt(c, 10)))
-    .filter(c => c && c !== 'NaN');
-  const codes = new Set(normalizedCodes);
-  const names = subjectCodes.map(c => getSubjectName(cls, c).toUpperCase());
-
-  const hasPhysics = codes.has('42') || names.some(n => /\bPHYSICS\b/.test(n));
-  const hasChemistry = codes.has('43') || names.some(n => /\bCHEMISTRY\b/.test(n));
-  const hasBusinessStudies = codes.has('54') || names.some(n => /BUSINESS STUDIES/.test(n));
-  const hasAccountancy = codes.has('55') || names.some(n => /ACCOUNTANCY/.test(n));
-
-  const artsSubjectCount = names.filter(n =>
-    /\bHISTORY\b|\bGEOGRAPHY\b|POLITICAL SCIENCE|\bSOCIOLOGY\b/.test(n)
-  ).length;
-
-  const hasVocByName = names.some(n =>
-    /MARKETING|TOURISM|WEB APPLICATION|WEB APPLICATIONS|FOOD PRODUCTION|FOOD NUTRITION|TYPOGRAPHY|BUSINESS ADMINISTRATION|INFORMATION TECHNOLOGY|OFFICE PROCEDURES|AUTOMOTIVE|HEALTH CARE|SECURITY|BEAUTY|RETAIL/.test(n)
-  );
-  const hasVocByCode = normalizedCodes.some(c => /^([48])\d{2}$/.test(c));
-
-  if (hasPhysics && hasChemistry) return 'SCIENCE';
-  if (hasBusinessStudies && hasAccountancy) return 'COMMERCE';
-  if (hasVocByName || hasVocByCode) return 'VOCATIONAL';
-  if (artsSubjectCount >= 1) return 'ARTS';
-
-  return 'UNCLASSIFIED';
+function countByResult(students, status) {
+  return students.filter(s => s.resultStatus === status).length;
 }
 
-function parseGazette(text) {
-  const cls = detectClass(text);
-  const lines = text.replace(/\u001a/g,'').split(/\n/);
-  const students = [];
-  let schoolCode = '';
-  let schoolName = '';
-  let examTitle = '';
-  let totals = null;
-
-  for (let i = 0; i < lines.length; i++) {
-    const raw = lines[i];
-    const line = normalizeSpaces(raw);
-    if (!line) continue;
-
-    if (!examTitle && /C\.B\.S\.E\./i.test(line)) examTitle = line;
-
-    const schoolMatch = line.match(/^SCHOOL\s*:\s*-\s*(\d+)\s+(.+)$/i);
-    if (schoolMatch) {
-      schoolCode = schoolMatch[1];
-      schoolName = schoolMatch[2].trim();
-      continue;
-    }
-
-    const totalMatch = line.match(/TOTAL CANDIDATES\s*:\s*(\d+)\s+TOTAL PASS\s*:\s*(\d+)\s+TOTAL COMPTT\.\s*:\s*(\d+)\s+TOTAL ESSENTIAL REPEAT\s*:\s*(\d+)\s+TOTAL ABSENT\s*:\s*(\d+)/i);
-    if (totalMatch) {
-      totals = {
-        totalCandidates: Number(totalMatch[1]),
-        totalPass: Number(totalMatch[2]),
-        totalComp: Number(totalMatch[3]),
-        totalEssentialRepeat: Number(totalMatch[4]),
-        totalAbsent: Number(totalMatch[5]),
-      };
-      continue;
-    }
-
-    const rec = parseRecordLine(line, cls);
-    if (rec) {
-      const marksPairs = parseMarksLine(lines[i+1] || '');
-      const subjects = rec.subjectCodes.map((code, idx) => {
-        const pair = marksPairs[idx] || { marks: null, grade: '' };
-        return {
-          code,
-          name: getSubjectName(cls, code),
-          marks: pair.marks,
-          grade: pair.grade
-        };
-      });
-      const validMarks = subjects.map(s => safeNumber(s.marks)).filter(n => Number.isFinite(n) && n > 0);
-      const bestFive = [...validMarks].sort((a,b) => b-a).slice(0, 5);
-      const best5Percentage = bestFive.length ? (bestFive.reduce((a,b)=>a+b,0) / bestFive.length) : 0;
-      const totalMarks = validMarks.reduce((a,b)=>a+b,0);
-      const stream = classifyStream(rec.subjectCodes, cls);
-
-      students.push({
-        roll: rec.roll,
-        sex: rec.sex,
-        name: rec.name,
-        result: rec.result,
-        compSubjects: rec.compSubjects,
-        subjectCodes: rec.subjectCodes,
-        subjects,
-        totalMarks,
-        best5Percentage,
-        stream
-      });
-    }
-  }
-
-  const statusCounts = students.reduce((acc, s) => {
-    acc[s.result] = (acc[s.result] || 0) + 1;
-    return acc;
-  }, { PASS:0, COMP:0, 'ESSENTIAL REPEAT':0, ABST:0 });
-
-  const genderCounts = students.reduce((acc, s) => {
-    acc[s.sex] = (acc[s.sex] || 0) + 1;
-    return acc;
-  }, { M:0, F:0 });
-
-  const subjectMap = new Map();
-  for (const st of students) {
-    for (const sub of st.subjects) {
-      const key = sub.code;
-      if (!subjectMap.has(key)) {
-        subjectMap.set(key, {
-          code: sub.code,
-          name: sub.name,
-          count: 0,
-          total: 0,
-          failLike: 0,
-          absentLike: 0,
-          grades: {}
-        });
-      }
-      const item = subjectMap.get(key);
-      item.count += 1;
-      if (typeof sub.marks === 'number') item.total += sub.marks;
-      if (sub.grade === 'E') item.failLike += 1;
-      if (sub.marks == null) item.absentLike += 1;
-      item.grades[sub.grade] = (item.grades[sub.grade] || 0) + 1;
-    }
-  }
-
-  const subjectStats = Array.from(subjectMap.values()).map(s => ({
-    ...s,
-    average: s.count ? +(s.total / s.count).toFixed(2) : 0
-  })).sort((a,b) => b.average - a.average);
-
-  const top10 = [...students]
-    .filter(s => s.result === 'PASS')
-    .sort((a,b) => b.best5Percentage - a.best5Percentage || b.totalMarks - a.totalMarks)
-    .slice(0, 10);
-
-  const streamStats = {};
-  if (cls === 12) {
-    for (const st of students) {
-      const key = st.stream || 'UNCLASSIFIED';
-      if (!streamStats[key]) streamStats[key] = { stream:key, total:0, pass:0, comp:0, essential:0, abst:0, avg:0 };
-      const x = streamStats[key];
-      x.total += 1;
-      x.avg += st.best5Percentage;
-      if (st.result === 'PASS') x.pass += 1;
-      else if (st.result === 'COMP') x.comp += 1;
-      else if (st.result === 'ESSENTIAL REPEAT') x.essential += 1;
-      else if (st.result === 'ABST') x.abst += 1;
-    }
-    for (const k of Object.keys(streamStats)) {
-      streamStats[k].avg = +(streamStats[k].avg / Math.max(streamStats[k].total,1)).toFixed(2);
-    }
-  }
-
-  return {
-    cls, schoolCode, schoolName, examTitle, totals,
-    students, statusCounts, genderCounts, subjectStats, top10, streamStats
+function buildSubjectMarkColumns(students) {
+  const codes = [...new Set(students.flatMap(s => s.subjects.map(sub => sub.code)))].sort((a, b) => a - b);
+  const headers = codes.map(code => String(code));
+  const valuesForStudent = (student) => {
+    const markByCode = new Map(student.subjects.map(sub => [sub.code, Number.isInteger(sub.marks) ? sub.marks : '-']));
+    return codes.map(code => markByCode.get(code) ?? '-');
   };
+  return { headers, valuesForStudent };
 }
 
-function renderMetaCards(data) {
-  const passPct = pct(data.statusCounts.PASS || 0, data.students.length).toFixed(2) + '%';
-  const cards = [
-    ['Class', data.cls],
-    ['School', `${data.schoolCode} · ${data.schoolName || 'N/A'}`],
-    ['Candidates', data.students.length],
-    ['Pass %', passPct],
-    ['File Type', data.cls === 12 ? 'Senior School Certificate' : 'Secondary School Examination']
-  ];
-  document.getElementById('metaCards').innerHTML = cards.map(([label, value]) => `
-    <div class="stat">
-      <div class="label">${label}</div>
-      <div class="value" style="font-size:${label==='School' ? '20px' : '28px'}">${value}</div>
+function isExcludedVocationalForBest5(code) {
+  return Number.isInteger(code) && code >= 400 && code <= 499;
+}
+
+function resultStatusColor(status) {
+  const s = String(status || '').toUpperCase();
+  if (s === 'PASS') return '#16a34a';
+  if (s === 'COMP' || s === 'COMPT' || s === 'COMPARTMENT') return '#eab308';
+  if (s === 'ESSENTIAL REPEAT') return '#dc2626';
+  if (s === 'ABST' || s === 'ABSENT') return '#6b7280';
+  return '#94a3b8';
+}
+
+function formatResultStatus(status) {
+  const s = String(status || '');
+  const u = s.toUpperCase();
+  if (u === 'PASS') return `<span class="rs-pass">${s}</span>`;
+  if (u === 'COMP' || u === 'COMPT' || u === 'COMPARTMENT') return `<span class="rs-comp">${s}</span>`;
+  if (u === 'ESSENTIAL REPEAT') return `<span class="rs-er">${s}</span>`;
+  if (u === 'ABST' || u === 'ABSENT') return `<span class="rs-abs">${s}</span>`;
+  return s;
+}
+
+function getBest5Stats(student, includeVocational) {
+  const marks = student.subjects
+    .filter(sub => Number.isInteger(sub.marks) && (includeVocational || !isExcludedVocationalForBest5(sub.code)))
+    .map(sub => sub.marks);
+
+  if (!marks.length) return { total: null, pct: null };
+
+  const best = [...marks].sort((a, b) => b - a).slice(0, Math.min(5, marks.length));
+  const total = best.reduce((a, b) => a + b, 0);
+  return { total, pct: +(total / best.length).toFixed(2) };
+}
+
+/* ============================================================
+   COMPUTE DERIVED
+   ============================================================ */
+function computeDerived() {
+  const p = state.parsed;
+  const subMap = new Map(), bucket = {}, gradeDist = {};
+
+  p.students.forEach(s => {
+    const best = getBest5Stats(s, state.includeVocationalInBest5);
+    s.bestTotal = best.total;
+    s.bestPct = best.pct;
+  });
+
+  p.students.forEach(s => {
+    bucket[s.resultStatus] = (bucket[s.resultStatus] || 0) + 1;
+    s.subjects.forEach(sub => {
+      if (!subMap.has(sub.code)) subMap.set(sub.code, { code: sub.code, name: sub.name, marks: [] });
+      if (Number.isInteger(sub.marks)) subMap.get(sub.code).marks.push(sub.marks);
+      if (sub.grade) gradeDist[sub.grade] = (gradeDist[sub.grade] || 0) + 1;
+    });
+  });
+
+  state.subjectSummary = Array.from(subMap.values()).map(s => {
+    const a = s.marks;
+    const avg = a.length ? +(a.reduce((x, y) => x + y, 0) / a.length).toFixed(2) : null;
+    return { code: s.code, name: s.name, students: a.length, avg,
+             high: a.length ? Math.max(...a) : null, low: a.length ? Math.min(...a) : null };
+  }).sort((a, b) => a.code - b.code);
+
+  state.resultBuckets    = bucket;
+  state.gradeDistribution= gradeDist;
+
+  const pass = p.students.filter(s => s.resultStatus === 'PASS');
+  const byAll  = arr => [...arr].sort((a, b) => (b.allPct  || 0) - (a.allPct  || 0) || (b.allTotal  || 0) - (a.allTotal  || 0) || a.roll.localeCompare(b.roll));
+  const byBest = arr => [...arr].sort((a, b) => (b.bestPct || 0) - (a.bestPct || 0) || (b.bestTotal || 0) - (a.bestTotal || 0) || a.roll.localeCompare(b.roll));
+
+  state.topAll  = byAll(pass).slice(0, 10);
+  state.topBest = byBest(pass).slice(0, 10);
+
+  /* Stream analysis — Class 12 only */
+  state.streamData = {};
+  if (p.detectedClass === 12) {
+    for (const k of Object.keys(STREAMS)) state.streamData[k] = { students: [] };
+    p.students.forEach(s => { s.stream = detectStream(s); state.streamData[s.stream].students.push(s); });
+    for (const k of Object.keys(STREAMS)) {
+      const arr  = state.streamData[k].students;
+      const ps   = arr.filter(s => s.resultStatus === 'PASS');
+      state.streamData[k].total   = arr.length;
+      state.streamData[k].pass    = ps.length;
+      state.streamData[k].topAll  = byAll(ps).slice(0, 10);
+      state.streamData[k].topBest = byBest(ps).slice(0, 10);
+    }
+  }
+}
+
+/* ============================================================
+   RENDER ALL
+   ============================================================ */
+function renderAll() {
+  const p = state.parsed;
+  $results.classList.remove('hidden');
+  $vocToggle.textContent = state.includeVocationalInBest5 ? 'WITH VOCATIONAL' : 'WITHOUT VOCATIONAL';
+  $vocToggle.className = state.includeVocationalInBest5 ? 'btn-red' : 'btn-green';
+  document.getElementById('examTitle').textContent =
+    p.examTitle || `Class ${p.detectedClass} Result Analysis`;
+  const metaEl = document.getElementById('meta');
+  const schoolLabel = `${p.schoolName}${p.schoolCode ? ' (' + p.schoolCode + ')' : ''}`;
+  const schoolColor = p.detectedClass === 10 ? '#1d4ed8' : '#dc2626';
+  metaEl.innerHTML = `<span style="color:${schoolColor};font-weight:700">${schoolLabel}</span> | ${p.examDate} | Region: ${p.region}`;
+
+  /* KPIs */
+  document.getElementById('kpis').innerHTML = [
+    ['Total Candidates', p.totals.candidates, ''],
+    ['Pass',             p.totals.pass,            'kpass'],
+    ['Compartment',      p.totals.comp,             'kcomp'],
+    ['Essential Repeat', p.totals.essentialRepeat,  'ker'],
+    ['Absent',           p.totals.absent,           'kabs']
+  ].map(([l, v, c]) =>
+    `<div class="kpi ${c}"><div class="kl">${l}</div><div class="kv">${v}</div></div>`
+  ).join('');
+
+  /* Warnings */
+  $warn.innerHTML = p.warnings.length
+    ? `<b>Warnings:</b><ul style="margin:4px 0 0 18px">${p.warnings.map(w => `<li>${w}</li>`).join('')}</ul>` : '';
+
+  /* Overall tables */
+  renderTable('tTopAll',  ['#', 'Roll', 'Name', 'All %', 'Total'],   state.topAll.map( (s, i) => [i+1, s.roll, s.name, s.allPct,  s.allTotal]));
+  renderTable('tTopBest', ['#', 'Roll', 'Name', 'Best 5 %', 'Total'],state.topBest.map((s, i) => [i+1, s.roll, s.name, s.bestPct, s.bestTotal]));
+  renderTable('tSubject', ['Code','Subject','Students','Avg','High','Low'],
+    state.subjectSummary.map(s => [s.code, s.name, s.students, s.avg, s.high, s.low]));
+
+  const hasStream = p.detectedClass === 12;
+  const markCols = buildSubjectMarkColumns(p.students);
+  renderTable('tStudents',
+    ['Roll', 'Name', 'Gender', 'Result', ...(hasStream ? ['Stream'] : []), ...markCols.headers, 'All %', 'Best 5 %'],
+    p.students.map(s => [s.roll, s.name, s.gender, formatResultStatus(s.resultStatus),
+      ...(hasStream ? [s.stream || '-'] : []),
+      ...markCols.valuesForStudent(s),
+      s.allPct, s.bestPct])
+  );
+
+  /* Live charts */
+  destroyCharts();
+  const resultLabels = Object.keys(state.resultBuckets);
+  makeChart('cBuckets', 'doughnut', resultLabels, Object.values(state.resultBuckets), resultLabels.map(resultStatusColor));
+  const top15 = state.subjectSummary.slice(0, 15);
+  makeChart('cSubjAvg', 'bar', top15.map(x => String(x.code)), top15.map(x => x.avg || 0), ['#0ea5e9']);
+  makeChart('cTop10', 'bar', state.topBest.map(s => s.name.split(' ')[0] + ' ' + (s.name.split(' ')[1] || '')),
+            state.topBest.map(s => s.bestPct || 0), ['#8b5cf6']);
+
+  /* Stream section */
+  const streamSection = document.getElementById('streamSection');
+  if (p.detectedClass === 12) {
+    streamSection.classList.remove('hidden');
+    renderStreamSection();
+  } else {
+    streamSection.classList.add('hidden');
+  }
+}
+
+/* ============================================================
+   STREAM SECTION RENDER
+   ============================================================ */
+function renderStreamSection() {
+  const sd   = state.streamData;
+  const total = state.parsed.students.length || 1;
+  const active = Object.keys(STREAMS).filter(k => sd[k].total > 0);
+
+  /* Stream summary cards */
+  document.getElementById('streamCards').innerHTML = active.map(k => {
+    const d  = STREAMS[k];
+    const s  = sd[k];
+    const pr = s.total ? ((s.pass / s.total) * 100).toFixed(1) : '0.0';
+    return `<div class="sc ${d.cls}">
+      <div class="sn">${d.label}</div>
+      <div class="sv">${s.total}</div>
+      <div class="ss">${((s.total / total) * 100).toFixed(1)}% total &nbsp;|&nbsp; Pass: ${s.pass} (${pr}%)</div>
+    </div>`;
+  }).join('');
+
+  /* Stream charts */
+  const colors = active.map(k => STREAMS[k].color);
+  makeChart('cStreamDist', 'doughnut', active.map(k => STREAMS[k].label), active.map(k => sd[k].total), colors);
+  makeChart('cStreamPass', 'bar',
+    active.map(k => STREAMS[k].label),
+    active.map(k => sd[k].total ? +((sd[k].pass / sd[k].total) * 100).toFixed(1) : 0),
+    colors);
+
+  /* Tabs + panes */
+  const tabsEl  = document.getElementById('streamTabs');
+  const panesEl = document.getElementById('streamPanes');
+
+  tabsEl.innerHTML = active.map((k, i) =>
+    `<button class="tb ${STREAMS[k].cls} ${i === 0 ? 'act' : ''}" onclick="switchTab('${k}',this)">
+      ${STREAMS[k].label} (${sd[k].total})
+    </button>`
+  ).join('');
+
+  panesEl.innerHTML = active.map((k, i) => `
+    <div class="tp ${i === 0 ? 'act' : ''}" id="pane_${k}">
+      <div class="grid2" style="margin-bottom:14px">
+        <div><h3>Top 10 — All Subjects %</h3> <div class="tbl-wrap"><table id="stAll_${k}"></table></div></div>
+        <div><h3>Top 10 — Best 5 %</h3>        <div class="tbl-wrap"><table id="stBest_${k}"></table></div></div>
+      </div>
+      <h3>All ${STREAMS[k].label} Students</h3>
+      <div class="tbl-wrap"><table id="stStudents_${k}"></table></div>
     </div>
   `).join('');
+
+  active.forEach(k => {
+    const markCols = buildSubjectMarkColumns(sd[k].students);
+    renderTable(`stAll_${k}`,      ['#','Roll','Name','All %','Total'],   sd[k].topAll.map( (s, i) => [i+1, s.roll, s.name, s.allPct,  s.allTotal]));
+    renderTable(`stBest_${k}`,     ['#','Roll','Name','Best 5 %','Total'],sd[k].topBest.map((s, i) => [i+1, s.roll, s.name, s.bestPct, s.bestTotal]));
+    renderTable(`stStudents_${k}`, ['Roll','Name','Gender','Result', ...markCols.headers, 'All %','Best 5 %'],
+      sd[k].students.map(s => [
+        s.roll,
+        s.name,
+        s.gender,
+        formatResultStatus(s.resultStatus),
+        ...markCols.valuesForStudent(s),
+        s.allPct,
+        s.bestPct
+      ]));
+  });
 }
 
-function renderBars(containerId, obj, grandTotal) {
-  const root = document.getElementById(containerId);
-  const entries = Object.entries(obj).filter(([_,v]) => v > 0 || grandTotal > 0);
-  root.innerHTML = entries.map(([k,v]) => `
-    <div class="bar-row">
-      <div><strong>${k}</strong></div>
-      <div class="bar"><span style="width:${pct(v, grandTotal)}%"></span></div>
-      <div>${v}</div>
-    </div>
-  `).join('');
+function switchTab(key, btn) {
+  document.querySelectorAll('.tb').forEach(b  => b.classList.remove('act'));
+  document.querySelectorAll('.tp').forEach(pane => pane.classList.remove('act'));
+  btn.classList.add('act');
+  document.getElementById(`pane_${key}`).classList.add('act');
 }
 
-function renderTable(tableId, headers, rows) {
-  const table = document.getElementById(tableId);
-  table.innerHTML = `
-    <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-    <tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
-  `;
+/* ============================================================
+   CHART HELPERS
+   ============================================================ */
+function destroyCharts() {
+  Object.values(_charts).forEach(c => c.destroy());
+  Object.keys(_charts).forEach(k => delete _charts[k]);
+}
+function makeChart(id, type, labels, data, colors) {
+  if (_charts[id]) { _charts[id].destroy(); delete _charts[id]; }
+  const canvas = document.getElementById(id);
+  if (!canvas) return;
+  _charts[id] = new Chart(canvas.getContext('2d'), {
+    type,
+    data: {
+      labels,
+      datasets: [{
+        label: id,
+        data,
+        backgroundColor: colors.length === 1 ? colors[0] : colors,
+        borderWidth: type === 'doughnut' ? 2 : 0,
+        borderColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: type === 'doughnut', position: 'right' },
+        title:  { display: false }
+      },
+      scales: type === 'doughnut' ? {} : { y: { beginAtZero: true } }
+    }
+  });
 }
 
-function renderTop10(data) {
-  const rows = data.top10.map((s, i) => [
-    i + 1,
+/* ============================================================
+   TABLE HELPER
+   ============================================================ */
+function renderTable(id, headers, rows) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML =
+    `<thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>` +
+    `<tbody>${rows.map(r =>
+      `<tr>${r.map(c => `<td>${c ?? ''}</td>`).join('')}</tr>`
+    ).join('')}</tbody>`;
+}
+
+/* ============================================================
+   EXCEL EXPORT
+   ============================================================ */
+function exportExcel() {
+  const p  = state.parsed;
+  const wb = XLSX.utils.book_new();
+  const exportFooter = "Powerd by SUBBIAH's CBSE RESULT ANALYSER 2026";
+
+  /* Summary sheet */
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    ['CBSE Result Analysis Report'],
+    [],
+    ['School',      `${p.schoolName} (${p.schoolCode})`],
+    ['Exam Title',  p.examTitle],
+    ['Date',        p.examDate],
+    ['Region',      p.region],
+    ['Class',       p.detectedClass],
+    [],
+    ['Metric', 'Count'],
+    ['Total Candidates',     p.totals.candidates],
+    ['Total Pass',           p.totals.pass],
+    ['Total Compartment',    p.totals.comp],
+    ['Total Essential Repeat', p.totals.essentialRepeat],
+    ['Total Absent',         p.totals.absent]
+  ]), 'Summary');
+
+  /* Student Master */
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
+    p.students.map(s => ({
+      roll_no:          s.roll,
+      name:             s.name,
+      gender:           s.gender,
+      result:           s.resultStatus,
+      stream:           p.detectedClass === 12 ? (s.stream || '-') : '-',
+      subject_codes:    s.subjects.map(x => x.code).join(' '),
+      all_total:        s.allTotal,
+      all_percentage:   s.allPct,
+      best5_total:      s.bestTotal,
+      best5_percentage: s.bestPct
+    }))
+  ), 'Student Master');
+
+  /* Subject Summary */
+  XLSX.utils.book_append_sheet(wb,
+    XLSX.utils.json_to_sheet(state.subjectSummary), 'Subject Summary');
+
+  /* Top 10 Overall */
+  XLSX.utils.book_append_sheet(wb,
+    XLSX.utils.json_to_sheet(state.topAll.map((s, i) =>
+      ({ rank: i+1, roll: s.roll, name: s.name, all_pct: s.allPct, all_total: s.allTotal }))),
+    'Top10 All Subjects');
+  XLSX.utils.book_append_sheet(wb,
+    XLSX.utils.json_to_sheet(state.topBest.map((s, i) =>
+      ({ rank: i+1, roll: s.roll, name: s.name, best5_pct: s.bestPct, best5_total: s.bestTotal }))),
+    'Top10 Best5');
+
+  /* Stream sheets (Class 12) */
+  if (p.detectedClass === 12) {
+    Object.entries(state.streamData).forEach(([key, sd]) => {
+      if (!sd.total) return;
+      const lbl = STREAMS[key].label;
+      const pr  = sd.total ? +((sd.pass / sd.total) * 100).toFixed(1) : 0;
+
+      /* Analysis summary per stream */
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+        [`${lbl} — Stream Analysis`],
+        ['Total Students',  sd.total],
+        ['Pass',            sd.pass],
+        ['Pass Rate %',     pr],
+        [],
+        ['Top 10 by Best 5 %'],
+        ['#', 'Roll', 'Name', 'Best 5 %', 'Best 5 Total'],
+        ...sd.topBest.map((s, i) => [i+1, s.roll, s.name, s.bestPct, s.bestTotal]),
+        [],
+        ['Top 10 by All Subjects %'],
+        ['#', 'Roll', 'Name', 'All %', 'All Total'],
+        ...sd.topAll.map((s, i) => [i+1, s.roll, s.name, s.allPct, s.allTotal])
+      ]), `${lbl} Analysis`);
+
+      /* Full student list per stream */
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
+        sd.students.map(s => ({
+          roll: s.roll, name: s.name, gender: s.gender,
+          result: s.resultStatus, all_pct: s.allPct, best5_pct: s.bestPct
+        }))
+      ), `${lbl} Students`);
+    });
+  }
+
+  wb.SheetNames.forEach(name => {
+    const ws = wb.Sheets[name];
+    XLSX.utils.sheet_add_aoa(ws, [[], [exportFooter]], { origin: -1 });
+  });
+
+  XLSX.writeFile(wb, `cbse_class${p.detectedClass}_${p.schoolCode || 'school'}.xlsx`);
+}
+
+/* ============================================================
+   PDF EXPORT
+   ============================================================ */
+async function exportPdf() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'p', unit: 'pt', format: 'a4' });
+  const p   = state.parsed;
+  const PW  = 515;  /* printable width */
+  const MARGIN_X = 40;
+  const exportFooter = "Powerd by SUBBIAH's CBSE RESULT ANALYSER 2026";
+
+  const ensurePageSpace = (needed = 90) => {
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const lastY = doc.lastAutoTable?.finalY || 40;
+    if (lastY + needed > pageHeight - 30) {
+      doc.addPage();
+      return 40;
+    }
+    return lastY + 12;
+  };
+
+  const addSectionTitle = (title, color = [15, 118, 110]) => {
+    const y = ensurePageSpace(40);
+    doc.setFontSize(12);
+    doc.setTextColor(color[0], color[1], color[2]);
+    doc.setFont(undefined, 'bold');
+    doc.text(title, MARGIN_X, y);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont(undefined, 'normal');
+    return y + 8;
+  };
+
+  /* Title */
+  doc.setFontSize(15); doc.setFont(undefined, 'bold');
+  doc.text('CBSE Result Analysis Report', MARGIN_X, 42);
+  doc.setFontSize(9); doc.setFont(undefined, 'normal');
+  doc.text(`${p.schoolName} (${p.schoolCode}) | Region: ${p.region}`, MARGIN_X, 56);
+  doc.text(`${p.examTitle} | Date: ${p.examDate} | Class: ${p.detectedClass}`, MARGIN_X, 68);
+
+  /* KPI + summary section */
+  doc.autoTable({
+    startY: 76,
+    head:  [['Metric', 'Count']],
+    body:  [
+      ['Total Candidates',     p.totals.candidates],
+      ['Total Pass',           p.totals.pass],
+      ['Total Compartment',    p.totals.comp],
+      ['Total Essential Repeat', p.totals.essentialRepeat],
+      ['Total Absent',         p.totals.absent]
+    ],
+    theme: 'grid', styles: { fontSize: 9 },
+    headStyles: { fillColor: [15, 118, 110] },
+    columnStyles: { 0: { cellWidth: 200 } }
+  });
+  let y = doc.lastAutoTable.finalY + 14;
+
+  /* Dashboard charts */
+  if (y > 640) { doc.addPage(); y = 40; }
+  const cBuckets = await makeOffChart('doughnut',
+    Object.keys(state.resultBuckets), Object.values(state.resultBuckets),
+    'Result Distribution', Object.keys(state.resultBuckets).map(resultStatusColor));
+  const top15 = state.subjectSummary.slice(0, 15);
+  const cSubj = await makeOffChart('bar', top15.map(x => String(x.code)), top15.map(x => x.avg || 0),
+    'Subject Average Marks', ['#0ea5e9']);
+  const cTop10 = await makeOffChart(
+    'bar',
+    state.topBest.map(s => s.name.split(' ')[0] + ' ' + (s.name.split(' ')[1] || '')),
+    state.topBest.map(s => s.bestPct || 0),
+    'Top 10 Students — Best 5 %',
+    ['#8b5cf6']
+  );
+
+  const half = (PW - 14) / 2;
+  doc.addImage(cBuckets, 'PNG', MARGIN_X, y, half, 155);
+  doc.addImage(cSubj,    'PNG', MARGIN_X + half + 14, y, half, 155);
+  y += 168;
+
+  if (y > 640) { doc.addPage(); y = 40; }
+  doc.addImage(cTop10, 'PNG', MARGIN_X, y, PW, 160);
+
+  /* Top 10 Students (Overall) tables */
+  doc.autoTable({
+    startY: y + 172,
+    head:  [['#', 'Roll No', 'Name', 'All %', 'All Total']],
+    body:  state.topAll.map((s, i) => [i + 1, s.roll, s.name, s.allPct ?? '', s.allTotal ?? '']),
+    theme: 'striped',
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [15, 118, 110] }
+  });
+  doc.autoTable({
+    startY: doc.lastAutoTable.finalY + 10,
+    head:  [['#', 'Roll No', 'Name', 'Best 5 %', 'Best 5 Total']],
+    body:  state.topBest.map((s, i) => [i + 1, s.roll, s.name, s.bestPct ?? '', s.bestTotal ?? '']),
+    theme: 'striped',
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [29, 78, 216] }
+  });
+
+  /* Subject Summary */
+  doc.autoTable({
+    startY: addSectionTitle('Subject Summary'),
+    head: [['Code', 'Subject', 'Students', 'Avg', 'High', 'Low']],
+    body: state.subjectSummary.map(s => [s.code, s.name, s.students, s.avg ?? '', s.high ?? '', s.low ?? '']),
+    theme: 'grid',
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [15, 118, 110] }
+  });
+
+  /* Student Master (subject-wise marks columns) */
+  const hasStream = p.detectedClass === 12;
+  const markCols = buildSubjectMarkColumns(p.students);
+  const studentHead = ['Roll', 'Name', 'Gender', 'Result', ...(hasStream ? ['Stream'] : []), ...markCols.headers, 'All %', 'Best 5 %'];
+  const studentBody = p.students.map(s => [
     s.roll,
     s.name,
-    s.sex,
-    s.stream || '—',
-    s.best5Percentage.toFixed(2) + '%',
-    s.totalMarks
+    s.gender,
+    s.resultStatus,
+    ...(hasStream ? [s.stream || '-'] : []),
+    ...markCols.valuesForStudent(s),
+    s.allPct ?? '',
+    s.bestPct ?? ''
   ]);
-  renderTable('top10Table', ['Rank','Roll','Name','Sex','Stream','Best 5 %','Total Marks'], rows);
-}
 
-function renderSubjectStats(data) {
-  const rows = data.subjectStats.map(s => [
-    s.code,
-    s.name,
-    s.count,
-    s.average.toFixed(2),
-    s.failLike,
-    s.absentLike
-  ]);
-  renderTable('subjectTable', ['Code','Subject','Count','Average','Grade E Count','No Marks'], rows);
-}
+  doc.autoTable({
+    startY: addSectionTitle('Student Master'),
+    head: [studentHead],
+    body: studentBody,
+    theme: 'grid',
+    styles: { fontSize: 7, cellPadding: 2 },
+    headStyles: { fillColor: [29, 78, 216] },
+    horizontalPageBreak: true,
+    horizontalPageBreakRepeat: [0, 1, 2, 3]
+  });
 
-function renderStudents(data) {
-  const rows = data.students.map(s => [
-    s.roll,
-    s.name,
-    s.sex,
-    s.stream || '—',
-    statusLabel(s.result),
-    s.best5Percentage.toFixed(2) + '%',
-    s.compSubjects.join(', '),
-    s.subjects.map(x => `${x.code} ${x.name}: ${x.marks ?? '—'} (${x.grade || ''})`).join('<br>')
-  ]);
-  renderTable('studentTable', ['Roll','Name','Sex','Stream','Result','Best 5 %','Comp Subjects','Subjects / Marks'], rows);
-}
+  /* ---- Class 12 stream section ---- */
+  if (p.detectedClass === 12) {
+    const sectionY = addSectionTitle('Stream-wise Analysis', [124, 58, 237]);
+    const active = Object.keys(STREAMS).filter(k => state.streamData[k].total > 0);
+    const sColors = active.map(k => STREAMS[k].color);
 
-function renderStreams(data) {
-  const section = document.getElementById('streamSection');
-  if (data.cls !== 12) {
-    section.classList.add('hidden');
-    return;
+    doc.autoTable({
+      startY: sectionY,
+      head:  [['Stream', 'Students', 'Pass', 'Pass Rate']],
+      body:  active.map(k => {
+        const sd = state.streamData[k];
+        return [STREAMS[k].label, sd.total, sd.pass, `${sd.total ? +((sd.pass/sd.total)*100).toFixed(1) : 0}%`];
+      }),
+      theme: 'grid', styles: { fontSize: 9 }, headStyles: { fillColor: [124, 58, 237] }
+    });
+    y = doc.lastAutoTable.finalY + 14;
+
+    if (y > 640) { doc.addPage(); y = 40; }
+    const cSDist = await makeOffChart('doughnut',
+      active.map(k => STREAMS[k].label), active.map(k => state.streamData[k].total),
+      'Stream Distribution', sColors);
+    const cSPass = await makeOffChart('bar',
+      active.map(k => STREAMS[k].label),
+      active.map(k => state.streamData[k].total ? +((state.streamData[k].pass/state.streamData[k].total)*100).toFixed(1) : 0),
+      'Pass Rate %', sColors);
+    doc.addImage(cSDist, 'PNG', MARGIN_X, y, 230, 155);
+    doc.addImage(cSPass, 'PNG', 284, y, PW - 244, 155);
+    y += 170;
+
+    /* Per-stream tables (top + all students) */
+    for (const key of active) {
+      const sd  = state.streamData[key];
+      const sy = addSectionTitle(`${STREAMS[key].label} Stream`, hexRgb(STREAMS[key].color));
+
+      doc.autoTable({
+        startY: sy,
+        head:  [['#', 'Roll No', 'Name', 'All %', 'All Total']],
+        body:  sd.topAll.map((s, i) => [i+1, s.roll, s.name, s.allPct ?? '', s.allTotal ?? '']),
+        theme: 'striped', styles: { fontSize: 8 },
+        headStyles: { fillColor: hexRgb(STREAMS[key].color) }
+      });
+
+      doc.autoTable({
+        startY: doc.lastAutoTable.finalY + 8,
+        head:  [['#', 'Roll No', 'Name', 'Best 5 %', 'All %']],
+        body:  sd.topBest.map((s, i) => [i+1, s.roll, s.name, s.bestPct ?? '', s.allPct ?? '']),
+        theme: 'striped', styles: { fontSize: 8 },
+        headStyles: { fillColor: hexRgb(STREAMS[key].color) }
+      });
+
+      const streamMarkCols = buildSubjectMarkColumns(sd.students);
+      const streamHead = ['Roll', 'Name', 'Gender', 'Result', ...streamMarkCols.headers, 'All %', 'Best 5 %'];
+      const streamBody = sd.students.map(s => [
+        s.roll,
+        s.name,
+        s.gender,
+        s.resultStatus,
+        ...streamMarkCols.valuesForStudent(s),
+        s.allPct ?? '',
+        s.bestPct ?? ''
+      ]);
+
+      doc.autoTable({
+        startY: doc.lastAutoTable.finalY + 8,
+        head: [streamHead],
+        body: streamBody,
+        theme: 'grid',
+        styles: { fontSize: 7, cellPadding: 2 },
+        headStyles: { fillColor: hexRgb(STREAMS[key].color) },
+        horizontalPageBreak: true,
+        horizontalPageBreakRepeat: [0, 1, 2, 3]
+      });
+    }
   }
-  section.classList.remove('hidden');
-  const streamEntries = Object.values(data.streamStats).sort((a,b) => b.total - a.total);
-  document.getElementById('streamCards').innerHTML = streamEntries.map(s => `
-    <div class="stream-card">
-      <h3>${s.stream}</h3>
-      <div class="small muted">Students: <strong>${s.total}</strong></div>
-      <div class="small muted">Pass: <strong>${s.pass}</strong> · Comp: <strong>${s.comp}</strong> · Essential Repeat: <strong>${s.essential}</strong> · Absent: <strong>${s.abst}</strong></div>
-      <div style="margin-top:8px"><strong>Average Best 5 %:</strong> ${s.avg.toFixed(2)}%</div>
-      <div class="bar" style="margin-top:10px"><span style="width:${pct(s.pass, Math.max(s.total,1))}%"></span></div>
-      <div class="small muted" style="margin-top:6px">Pass rate: ${pct(s.pass, Math.max(s.total,1)).toFixed(2)}%</div>
-    </div>
-  `).join('');
+
+  applyPdfFooter(doc, exportFooter);
+  doc.save(`cbse_class${p.detectedClass}_${p.schoolCode || 'school'}.pdf`);
 }
 
-function buildOverviewRows(data) {
-  const total = data.students.length;
-  return [
-    ['Class', data.cls],
-    ['School Code', data.schoolCode],
-    ['School Name', data.schoolName],
-    ['Exam Title', data.examTitle],
-    ['Total Candidates Parsed', total],
-    ['PASS', data.statusCounts.PASS || 0],
-    ['COMP', data.statusCounts.COMP || 0],
-    ['ESSENTIAL REPEAT', data.statusCounts['ESSENTIAL REPEAT'] || 0],
-    ['ABST', data.statusCounts.ABST || 0],
-    ['Pass Percentage', (pct(data.statusCounts.PASS || 0, total)).toFixed(2) + '%']
-  ];
-}
+function applyPdfFooter(doc, footerText) {
+  const pageCount = doc.getNumberOfPages();
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
 
-function toCsv(rows) {
-  return rows.map(row => row.map(val => {
-    const s = String(val ?? '').replace(/"/g, '""');
-    return `"${s}"`;
-  }).join(',')).join('\n');
-}
-
-function downloadFile(content, filename, mime) {
-  const blob = new Blob([content], { type: mime });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
-
-function xmlEscape(s) {
-  return String(s ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
-function sheetXmlCell(value, styleId = '') {
-  const styleAttr = styleId ? ` ss:StyleID="${styleId}"` : '';
-  return `<Cell${styleAttr}><Data ss:Type="String">${xmlEscape(value)}</Data></Cell>`;
-}
-
-function makeExcelFooter() {
-  return `&C&"Arial,Bold"&12&P Powered by Subbiah's CBSE Result Analyser 2026`;
-}
-
-function sheetXml(name, headers, rows) {
-  const colCount = Math.max(headers.length, ...rows.map(r => r.length), 2);
-  const draftRow = `<Row ss:Height="26">${sheetXmlCell('A Draft, NOT FINAL', 'DraftWatermark')}<Cell ss:MergeAcross="${Math.max(colCount - 1, 0)}"/></Row>`;
-  const headerRow = `<Row>${headers.map(c => sheetXmlCell(c, 'Header')).join('')}</Row>`;
-  const bodyRows = rows.map(r => `<Row>${r.map(c => sheetXmlCell(c)).join('')}</Row>`).join('');
-  return `<Worksheet ss:Name="${xmlEscape(name.slice(0,31))}">
-    <Table>${draftRow}${headerRow}${bodyRows}</Table>
-    <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
-      <PageSetup>
-        <Layout x:Orientation="Portrait"/>
-        <Footer x:Data="${xmlEscape(makeExcelFooter())}"/>
-      </PageSetup>
-    </WorksheetOptions>
-  </Worksheet>`;
-}
-
-function buildExcelWorkbook(data) {
-  const overviewRows = buildOverviewRows(data);
-  const studentsRows = data.students.map(s => [
-    s.roll, s.name, s.sex, s.stream || '', s.result, s.best5Percentage.toFixed(2), s.compSubjects.join(' '),
-    s.subjects.map(x => `${x.code} ${x.name}:${x.marks ?? ''} ${x.grade}`).join(' | ')
-  ]);
-  const topRows = data.top10.map((s, i) => [i+1, s.roll, s.name, s.sex, s.stream || '', s.best5Percentage.toFixed(2), s.totalMarks]);
-  const subRows = data.subjectStats.map(s => [s.code, s.name, s.count, s.average.toFixed(2), s.failLike, s.absentLike]);
-  const streamRows = data.cls === 12
-    ? Object.values(data.streamStats).map(s => [s.stream, s.total, s.pass, s.comp, s.essential, s.abst, s.avg.toFixed(2)])
-    : [['Not applicable for Class 10','','','','','','']];
-
-  return `<?xml version="1.0"?>
-  <?mso-application progid="Excel.Sheet"?>
-  <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
-   xmlns:o="urn:schemas-microsoft-com:office:office"
-   xmlns:x="urn:schemas-microsoft-com:office:excel"
-   xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
-   xmlns:html="http://www.w3.org/TR/REC-html40">
-   <Styles>
-    <Style ss:ID="Header"><Font ss:Bold="1"/></Style>
-    <Style ss:ID="DraftWatermark">
-      <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
-      <Font ss:Bold="1" ss:Italic="1" ss:Size="16" ss:Color="#B8C0CC"/>
-      <Interior ss:Color="#FFFFFF" ss:Pattern="Solid"/>
-    </Style>
-   </Styles>
-   ${sheetXml('Overview', ['Metric','Value'], overviewRows)}
-   ${sheetXml('Top10', ['Rank','Roll','Name','Sex','Stream','Best5Percent','TotalMarks'], topRows)}
-   ${sheetXml('SubjectStats', ['Code','Subject','Count','Average','GradeECount','NoMarks'], subRows)}
-   ${sheetXml('Students', ['Roll','Name','Sex','Stream','Result','Best5Percent','CompSubjects','Subjects'], studentsRows)}
-   ${sheetXml('StreamWise', ['Stream','Total','Pass','Comp','EssentialRepeat','Absent','AvgBest5Percent'], streamRows)}
-  </Workbook>`;
-}
-
-function downloadExcel(data) {
-  const xml = buildExcelWorkbook(data);
-  downloadFile(xml, `cbse_analysis_class_${data.cls}.xls`, 'application/vnd.ms-excel');
-}
-
-function downloadStudentsCsv(data) {
-  const headers = ['Roll','Name','Sex','Stream','Result','Best5Percent','CompSubjects','Subjects'];
-  const rows = data.students.map(s => [
-    s.roll, s.name, s.sex, s.stream || '', s.result, s.best5Percentage.toFixed(2), s.compSubjects.join(' '),
-    s.subjects.map(x => `${x.code} ${x.name}:${x.marks ?? ''} (${x.grade})`).join(' | ')
-  ]);
-  downloadFile(toCsv([headers, ...rows]), `cbse_students_class_${data.cls}.csv`, 'text/csv;charset=utf-8');
-}
-
-function buildReportHtml() {
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CBSE Result Report</title>
-  <style>
-    body{font-family:Arial,sans-serif;padding:20px;background:#fff;color:#111;position:relative}
-    table{border-collapse:collapse;width:100%;font-size:12px;background:#fff}
-    th,td{border:1px solid #ccc;padding:6px;text-align:left;vertical-align:top}
-    h1,h2{margin:0 0 12px}
-    .section{margin-top:20px;position:relative;z-index:2}
-    .chip{padding:2px 8px;border-radius:999px;background:#eee;display:inline-block}
-    .draft-watermark{
-      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
-      font-size:64px;font-weight:700;color:rgba(120,130,145,.12);transform:rotate(-28deg);
-      z-index:0;pointer-events:none;user-select:none;letter-spacing:2px;
-    }
-    .page-footer{
-      position:fixed;left:0;right:0;bottom:8px;text-align:center;
-      font-size:14px;font-weight:700;color:#c00000;z-index:3;
-    }
-    @media print{
-      @page{margin:18mm 12mm 18mm 12mm}
-      body{padding:0}
-      .draft-watermark{position:fixed}
-      .page-footer{position:fixed;bottom:6mm}
-    }
-  </style>
-  </head><body>
-  <div class="draft-watermark">A Draft, NOT FINAL</div>
-  <div class="page-footer">Powered by Subbiah's CBSE Result Analyser 2026</div>
-  <h1>CBSE Result Analysis Report</h1>
-  <div>Generated from browser analyzer</div>
-  <div class="section"><h2>Overview</h2>${document.getElementById('metaCards').outerHTML}</div>
-  <div class="section"><h2>Top 10 Students</h2>${document.getElementById('top10Table').outerHTML}</div>
-  <div class="section"><h2>Subject Performance</h2>${document.getElementById('subjectTable').outerHTML}</div>
-  <div class="section"><h2>Full Student Report</h2>${document.getElementById('studentTable').outerHTML}</div>
-  </body></html>`;
-}
-
-function analyzeText(text) {
-  currentData = parseGazette(text);
-  document.getElementById('reportRoot').classList.remove('hidden');
-  renderMetaCards(currentData);
-  renderBars('resultBars', currentData.statusCounts, currentData.students.length);
-  renderBars('genderBars', currentData.genderCounts, currentData.students.length);
-  renderTop10(currentData);
-  renderSubjectStats(currentData);
-  renderStudents(currentData);
-  renderStreams(currentData);
-}
-
-document.getElementById('analyzeBtn').addEventListener('click', async () => {
-  const file = document.getElementById('fileInput').files[0];
-  if (!file) {
-    alert('Please choose a .txt file first.');
-    return;
+  for (let pageNo = 1; pageNo <= pageCount; pageNo++) {
+    doc.setPage(pageNo);
+    doc.setFontSize(9);
+    doc.setTextColor(220, 38, 38);
+    doc.setFont('helvetica', 'bold');
+    doc.text(footerText, pageWidth / 2, pageHeight - 14, { align: 'center' });
   }
-  const text = await file.text();
-  analyzeText(text);
-});
+  doc.setTextColor(0, 0, 0);
+}
 
-document.getElementById('downloadExcelBtn').addEventListener('click', () => {
-  if (!currentData) return;
-  downloadExcel(currentData);
-});
+function makeOffChart(type, labels, data, title, colors) {
+  return new Promise(resolve => {
+    const canvas = document.createElement('canvas');
+    canvas.width  = 900;
+    canvas.height = 480;
+    const chart = new Chart(canvas.getContext('2d'), {
+      type,
+      data: {
+        labels,
+        datasets: [{
+          label: title, data,
+          backgroundColor: colors.length === 1 ? colors[0] : colors,
+          borderWidth: type === 'doughnut' ? 2 : 0,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: false, animation: false,
+        plugins: {
+          legend: { display: type === 'doughnut', position: 'right' },
+          title:  { display: true, text: title, font: { size: 15 } }
+        },
+        scales: type === 'doughnut' ? {} : { y: { beginAtZero: true } }
+      }
+    });
+    setTimeout(() => { const img = canvas.toDataURL('image/png'); chart.destroy(); resolve(img); }, 120);
+  });
+}
 
-document.getElementById('downloadStudentsCsvBtn').addEventListener('click', () => {
-  if (!currentData) return;
-  downloadStudentsCsv(currentData);
-});
-
-document.getElementById('downloadReportBtn').addEventListener('click', () => {
-  if (!currentData) return;
-  downloadFile(buildReportHtml(), `cbse_full_report_class_${currentData.cls}.html`, 'text/html;charset=utf-8');
-});
+function hexRgb(hex) {
+  return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)];
+}
 </script>
 </body>
 </html>

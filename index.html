@@ -10,23 +10,50 @@
   <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
   <style>
     :root {
-      --bg:#f0f4fb; --panel:#f1f5f9; --text:#1e293b; --muted:#64748b; --line:#e2e8f0;
+      --bg:#e8f1ef; --panel:#f7fbfa; --text:#1f2937; --muted:#475569; --line:#cfdfe3;
       --ac1:#0f766e; --ac2:#1d4ed8; --ac3:#7c3aed;
       --sci:#0284c7; --com:#15803d; --art:#c2410c; --voc:#7c3aed; --oth:#475569;
+      --tile-1:#e9efff;
+      --tile-2:#f4f0e1;
+      --tile-3:#e7f4ea;
+      --tile-4:#eee8f6;
+      --tile-5:#f5f1e6;
+      --tile-6:#f8ecea;
+      --tile-7:#e1f2fb;
+      --tile-8:#efebf9;
+      --tile-9:#e7edfb;
     }
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+    body{
+      font-family:Segoe UI,Arial,sans-serif;
+      background:
+        radial-gradient(circle at 12% 8%, #f6fbff 0%, transparent 35%),
+        radial-gradient(circle at 88% 14%, #eafaf3 0%, transparent 34%),
+        linear-gradient(145deg, #e8f1ef 0%, #edf5ff 48%, #f6fbfa 100%);
+      color:var(--text);
+      font-size:15px;
+      line-height:1.45;
+    }
     .wrap{max-width:1240px;margin:0 auto;padding:24px 16px}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:0 10px 24px rgba(15,23,42,.05)}
+    .tone-1{background:var(--tile-1)}
+    .tone-2{background:var(--tile-2)}
+    .tone-3{background:var(--tile-3)}
+    .tone-4{background:var(--tile-4)}
+    .tone-5{background:var(--tile-5)}
+    .tone-6{background:var(--tile-6)}
+    .tone-7{background:var(--tile-7)}
+    .tone-8{background:var(--tile-8)}
+    .tone-9{background:var(--tile-9)}
     h1{font-size:1.55rem;margin-bottom:4px}
-    h2{font-size:1.15rem;margin-bottom:14px;color:var(--text)}
-    h3{font-size:.95rem;margin-bottom:10px;color:var(--text)}
-    .subtitle{color:var(--muted);font-size:.85rem;margin-bottom:18px}
+    h2{font-size:1.22rem;margin-bottom:14px;color:var(--text)}
+    h3{font-size:1.02rem;margin-bottom:10px;color:var(--text)}
+    .subtitle{color:var(--muted);font-size:.92rem;margin-bottom:18px}
     /* upload row */
-    .upload-row{display:grid;grid-template-columns:2.5fr 2fr 1fr 1fr;gap:12px;align-items:end}
-    label{display:block;margin-bottom:5px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+    .upload-row{display:grid;grid-template-columns:2.5fr 2fr;gap:12px;align-items:end}
+    label{display:block;margin-bottom:5px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
     input[type=file]{width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--line);font:inherit;background:#fff;cursor:pointer}
-    button{width:100%;padding:10px 14px;border-radius:10px;border:none;font:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s}
+    button{width:100%;padding:10px 14px;border-radius:10px;border:none;font:inherit;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s}
     button:hover{opacity:.88}
     button:disabled{opacity:.4;cursor:not-allowed}
     .btn-green{background:var(--ac1);color:#fff}
@@ -35,21 +62,23 @@
     .btn-red{background:#dc2626;color:#fff}
     .btn-slate{background:#475569;color:#fff}
     /* badge */
-    .badge{display:inline-block;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:600}
+    .badge{display:inline-block;padding:3px 11px;border-radius:20px;font-size:14px;font-weight:700}
+    #detBadge{font-size:20px;font-weight:700;line-height:1.1}
     .badge-10{background:#dbeafe;color:#1e40af}
     .badge-12{background:#ede9fe;color:#5b21b6}
     .badge-err{background:#fee2e2;color:#991b1b}
     /* status */
-    .status{margin-top:10px;font-size:13px;min-height:18px}
+    .status{margin-top:10px;font-size:14px;min-height:18px}
     .status.ok{color:#15803d}
     .status.err{color:#b91c1c;font-weight:600}
     .status.warn{color:#9a3412}
     /* KPIs */
-    .kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+    .kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
     .kpi{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
     .kpi .kl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
     .kpi .kv{font-size:26px;font-weight:700}
     .kpi.kpass .kv{color:#16a34a}
+    .kpi.kpasspct .kv{color:#0891b2}
     .kpi.kcomp .kv{color:#eab308}
     .kpi.ker   .kv{color:#dc2626}
     .kpi.kabs  .kv{color:#6b7280}
@@ -68,19 +97,20 @@
     .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
     /* tables */
     .tbl-wrap{overflow:auto;max-height:420px;border:1px solid var(--line);border-radius:10px}
-    table{width:100%;border-collapse:collapse;font-size:12.5px}
+    table{width:100%;border-collapse:collapse;font-size:13.5px}
     th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;white-space:nowrap}
-    th{background:#f8fafc;position:sticky;top:0;z-index:1;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+    th{background:#f8fafc;position:sticky;top:0;z-index:1;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
     tr:last-child td{border-bottom:none}
     tr:hover td{background:#f1f5f9}
     /* stream cards */
     .stream-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:16px}
     .sc{border-radius:12px;padding:14px;color:#fff}
     .sc.sci{background:var(--sci)}.sc.com{background:var(--com)}.sc.art{background:var(--art)}.sc.voc{background:var(--voc)}.sc.oth{background:var(--oth)}
-    .sc .sn{font-size:12px;opacity:.85;margin-bottom:4px}.sc .sv{font-size:24px;font-weight:700}.sc .ss{font-size:11px;opacity:.8;margin-top:2px}
+    .sc .sn{font-size:13px;opacity:.85;margin-bottom:4px}.sc .sv{font-size:25px;font-weight:700}.sc .ss{font-size:12px;opacity:.9;margin-top:2px}
     /* tabs */
     .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-    .tb{padding:6px 16px;border-radius:20px;border:1px solid var(--line);background:var(--bg);color:var(--muted);font-size:13px;font-weight:500;cursor:pointer;width:auto;transition:all .15s}
+    .tb{padding:6px 16px;border-radius:20px;border:1px solid var(--line);background:var(--bg);color:var(--muted);font-size:14px;font-weight:600;cursor:pointer;width:auto;transition:all .15s}
+    .tb .tab-icon{display:inline-block;margin-right:8px;font-size:14px;line-height:1}
     .tb.act{color:#fff;border-color:transparent}
     .tb.sci.act{background:var(--sci)}.tb.com.act{background:var(--com)}.tb.art.act{background:var(--art)}.tb.voc.act{background:var(--voc)}.tb.oth.act{background:var(--oth)}
     .tp{display:none}.tp.act{display:block}
@@ -91,7 +121,7 @@
       body{background:#fff !important; position:relative; padding-bottom:26mm}
       button,.export-row{display:none}
       body::after{
-        content:"Powerd by SUBBIAH's CBSE RESULT ANALYSER 2026";
+        content:"Powered by SUBBIAH's CBSE RESULT ANALYSER 2026";
         position:fixed;
         left:0;
         right:0;
@@ -109,26 +139,18 @@
 <div class="wrap">
 
   <!-- Upload Panel -->
-  <div class="card">
+  <div class="card tone-1">
     <h1>CBSE Result Analyzer</h1>
-    <p class="subtitle">Upload a CBSE gazette TXT file — class level (10 / 12) is auto-detected from the exam title.</p>
+    <p class="subtitle">Upload a CBSE RESULT TXT file — class level (10 / 12).</p>
     <div class="upload-row">
       <div>
-        <label for="txtFile">CBSE Gazette TXT File</label>
+        <label for="txtFile">CBSE RESULT TXT File</label>
         <input id="txtFile" type="file" accept=".txt,.TXT">
       </div>
       <div style="display:flex;align-items:center;gap:8px;padding-top:22px">
         <span style="font-size:12px;color:var(--muted)">Detected:</span>
         <span id="detBadge" class="badge" style="display:none"></span>
         <span id="detWait" style="font-size:12px;color:var(--muted)">awaiting file…</span>
-      </div>
-      <div>
-        <label>&nbsp;</label>
-        <button id="goBtn" class="btn-green" disabled>Analyse</button>
-      </div>
-      <div>
-        <label>&nbsp;</label>
-        <button id="resetBtn" class="btn-slate">Reset</button>
       </div>
     </div>
     <div id="statusEl" class="status"></div>
@@ -139,14 +161,14 @@
   <div id="resultArea" class="hidden">
 
     <!-- Header Meta + KPIs -->
-    <div class="card">
+    <div class="card tone-2">
       <h2 id="examTitle">Exam</h2>
       <p id="meta" style="color:var(--muted);font-size:12.5px;margin-bottom:14px"></p>
       <div class="kpis" id="kpis"></div>
     </div>
 
     <!-- Exports -->
-    <div class="card export-row">
+    <div class="card tone-3 export-row">
       <button id="excelBtn" class="btn-green">&#8681; Download Excel</button>
       <button id="pdfBtn"   class="btn-blue">&#8681; Download PDF Report</button>
       <button onclick="window.print()" class="btn-purple">&#128438; Print Page</button>
@@ -155,17 +177,22 @@
 
     <!-- Charts row 1 -->
     <div class="chart-grid-1">
-      <div class="chart-box"><h3>Result Distribution</h3><canvas id="cBuckets"></canvas></div>
+      <div class="chart-box tone-9"><h3>Result Distribution</h3><canvas id="cBuckets"></canvas></div>
+    </div>
+
+    <div class="card tone-4">
+      <h2>Gender-wise Summary</h2>
+      <div class="tbl-wrap"><table id="tGender"></table></div>
     </div>
 
     <!-- Charts row 2 -->
     <div class="chart-grid-2">
-      <div class="chart-box"><h3>Subject-wise Average Marks (top 15 subjects)</h3><canvas id="cSubjAvg"></canvas></div>
-      <div class="chart-box"><h3>Top 10 Students — Best 5 %</h3><canvas id="cTop10"></canvas></div>
+      <div class="chart-box tone-7"><h3>Subject-wise Average Marks (top 15 subjects)</h3><canvas id="cSubjAvg"></canvas></div>
+      <div class="chart-box tone-8"><h3>Top 10 Students — Best 5 %</h3><canvas id="cTop10"></canvas></div>
     </div>
 
     <!-- Top 10 Tables (overall) -->
-    <div class="card">
+    <div class="card tone-5">
       <h2>Top 10 Students (Overall)</h2>
       <div class="grid2">
         <div><h3>By All Subjects %</h3><div class="tbl-wrap"><table id="tTopAll"></table></div></div>
@@ -174,13 +201,13 @@
     </div>
 
     <!-- ===== CLASS 12 STREAM SECTION ===== -->
-    <div id="streamSection" class="card hidden">
+    <div id="streamSection" class="card tone-6 hidden">
       <h2>Stream-wise Analysis (Class 12)</h2>
       <div class="stream-cards" id="streamCards"></div>
 
       <div class="chart-grid-2">
-        <div class="chart-box"><h3>Stream Distribution</h3><canvas id="cStreamDist"></canvas></div>
-        <div class="chart-box"><h3>Pass Rate by Stream</h3><canvas id="cStreamPass"></canvas></div>
+        <div class="chart-box tone-3"><h3>Stream Distribution</h3><canvas id="cStreamDist"></canvas></div>
+        <div class="chart-box tone-1"><h3>Pass Rate by Stream</h3><canvas id="cStreamPass"></canvas></div>
       </div>
 
       <div class="tabs" id="streamTabs"></div>
@@ -188,13 +215,13 @@
     </div>
 
     <!-- Subject Summary -->
-    <div class="card">
+    <div class="card tone-7">
       <h2>Subject Summary</h2>
       <div class="tbl-wrap"><table id="tSubject"></table></div>
     </div>
 
     <!-- Student Master -->
-    <div class="card">
+    <div class="card tone-9">
       <h2>Student Master</h2>
       <div class="tbl-wrap"><table id="tStudents"></table></div>
     </div>
@@ -275,15 +302,15 @@ const SUBJECTS = {
    Detection order: VOCATIONAL first (any 800–899 code),
    then SCIENCE (Physics 42 + Chemistry 43),
    then COMMERCE (Business Studies 54 + Accountancy 55),
-   then ARTS (History 27 + Political Science 28),
+  then ARTS (any 2 of: 27 History, 28 Political Science, 29 Geography, 39 Sociology),
    else OTHER.
    ============================================================ */
 const STREAMS = {
-  SCIENCE:    { label:'Science',    color:'#0284c7', cls:'sci' },
-  COMMERCE:   { label:'Commerce',   color:'#15803d', cls:'com' },
-  ARTS:       { label:'Arts',       color:'#c2410c', cls:'art' },
-  VOCATIONAL: { label:'Vocational', color:'#7c3aed', cls:'voc' },
-  OTHER:      { label:'Other',      color:'#475569', cls:'oth' }
+  SCIENCE:    { label:'Science',    color:'#0284c7', cls:'sci', icon:'⚗' },
+  COMMERCE:   { label:'Commerce',   color:'#15803d', cls:'com', icon:'📈' },
+  ARTS:       { label:'Arts',       color:'#c2410c', cls:'art', icon:'🎨' },
+  VOCATIONAL: { label:'Vocational', color:'#7c3aed', cls:'voc', icon:'🛠' },
+  OTHER:      { label:'Other',      color:'#475569', cls:'oth', icon:'🧩' }
 };
 
 function detectStream(student) {
@@ -292,7 +319,8 @@ function detectStream(student) {
   if (codes.some(c => c >= 800 && c <= 899)) return 'VOCATIONAL';
   if (has(42) && has(43))  return 'SCIENCE';
   if (has(54) && has(55))  return 'COMMERCE';
-  if (has(27) && has(28))  return 'ARTS';
+  const artsCoreCount = [27, 28, 29, 39].filter(has).length;
+  if (artsCoreCount >= 2)  return 'ARTS';
   return 'OTHER';
 }
 
@@ -304,6 +332,7 @@ const state = {
   subjectSummary: [],
   resultBuckets:  {},
   gradeDistribution: {},
+  genderStats: [],
   topAll:  [],
   topBest: [],
   streamData: {},
@@ -315,14 +344,28 @@ const _charts = {};   /* live Chart.js instances */
    DOM
    ============================================================ */
 const $txtFile   = document.getElementById('txtFile');
-const $goBtn     = document.getElementById('goBtn');
-const $resetBtn  = document.getElementById('resetBtn');
 const $excelBtn  = document.getElementById('excelBtn');
 const $pdfBtn    = document.getElementById('pdfBtn');
 const $vocToggle = document.getElementById('vocToggleBtn');
 const $status    = document.getElementById('statusEl');
 const $warn      = document.getElementById('warnEl');
 const $results   = document.getElementById('resultArea');
+
+async function runAnalysis(file, text, detectedClass) {
+  setStatus('', '');
+  $warn.innerHTML = '';
+  if (!file) { setStatus('Upload a TXT file first.', 'err'); return; }
+  try {
+    const parsed = parseCbseText(text, detectedClass, file.name);
+    state.parsed = parsed;
+    computeDerived();
+    renderAll();
+    setStatus(`✓ Parsed ${parsed.students.length} students successfully.`, 'ok');
+  } catch(err) {
+    $results.classList.add('hidden');
+    setStatus(err.message || String(err), 'err');
+  }
+}
 
 /* ============================================================
    FILE SELECTION → auto-detect class
@@ -333,20 +376,17 @@ $txtFile.addEventListener('change', async () => {
   badge.style.display = 'none';
   wait.textContent    = 'reading…';
   wait.style.display  = '';
-  $goBtn.disabled     = true;
-  $goBtn._cl          = null;
   setStatus('', '');
 
   if (!$txtFile.files.length) { wait.textContent = 'awaiting file…'; return; }
   const text = await $txtFile.files[0].text();
   try {
     const cl = detectClass(text);
-    badge.textContent   = `Class ${cl} detected`;
+    badge.textContent   = `Class ${cl}`;
     badge.className     = `badge badge-${cl}`;
     badge.style.display = 'inline-block';
     wait.style.display  = 'none';
-    $goBtn.disabled     = false;
-    $goBtn._cl          = cl;
+    await runAnalysis($txtFile.files[0], text, cl);
   } catch(e) {
     badge.textContent   = 'Unknown';
     badge.className     = 'badge badge-err';
@@ -354,46 +394,6 @@ $txtFile.addEventListener('change', async () => {
     wait.style.display  = 'none';
     setStatus(e.message, 'err');
   }
-});
-
-/* ============================================================
-   ANALYSE BUTTON
-   ============================================================ */
-$goBtn.addEventListener('click', async () => {
-  setStatus('', '');
-  $warn.innerHTML = '';
-  const file = $txtFile.files[0];
-  if (!file) { setStatus('Upload a TXT file first.', 'err'); return; }
-  const text = await file.text();
-  try {
-    const parsed = parseCbseText(text, $goBtn._cl, file.name);
-    state.parsed = parsed;
-    computeDerived();
-    renderAll();
-    setStatus(`✓ Parsed ${parsed.students.length} students successfully.`, 'ok');
-  } catch(err) {
-    $results.classList.add('hidden');
-    setStatus(err.message || String(err), 'err');
-  }
-});
-
-/* ============================================================
-   RESET
-   ============================================================ */
-$resetBtn.addEventListener('click', () => {
-  $txtFile.value = '';
-  state.parsed   = null;
-  $results.classList.add('hidden');
-  setStatus('', '');
-  $warn.innerHTML = '';
-  const badge = document.getElementById('detBadge');
-  const wait  = document.getElementById('detWait');
-  badge.style.display = 'none';
-  wait.textContent    = 'awaiting file…';
-  wait.style.display  = '';
-  $goBtn.disabled     = true;
-  $goBtn._cl          = null;
-  destroyCharts();
 });
 
 $excelBtn.addEventListener('click', () => { if (state.parsed) exportExcel(); });
@@ -420,7 +420,7 @@ function detectClass(text) {
   const u = text.toUpperCase();
   if (u.includes('CERTIFICATE'))                    return 12;
   if (u.includes('SECONDARY SCHOOL EXAMINATION'))   return 10;
-  throw new Error('Cannot detect class from file title. Is this a valid CBSE gazette?');
+  throw new Error('Cannot detect class from file title. Is this a valid CBSE result file?');
 }
 
 /* ============================================================
@@ -448,7 +448,7 @@ function parseCbseText(rawText, detectedClass, filename) {
     warnings.push(...res.warnings);
   }
 
-  if (!students.length) throw new Error('No student records found. Check that this is a valid CBSE gazette TXT.');
+  if (!students.length) throw new Error('No student records found. Check that this is a valid CBSE result TXT.');
   if (fm && +fm[1] !== students.length)
     warnings.push(`Footer says ${fm[1]} candidates, but parsed ${students.length}.`);
 
@@ -515,7 +515,9 @@ function parseStudentLine(recordLine, marksLine, classLevel) {
 
   return {
     student: { roll, gender, name, resultStatus, internalGrades, compSubjects,
-               subjects, allTotal, allPct, bestTotal, bestPct },
+               subjects, allTotal, allPct, bestTotal, bestPct,
+               rawRecordLine: recordLine,
+               rawMarksLine: marksLine },
     warnings
   };
 }
@@ -550,6 +552,45 @@ function buildSubjectMarkColumns(students) {
   return { headers, valuesForStudent };
 }
 
+function buildStudentMasterExportRows(students, detectedClass) {
+  const codes = [...new Set(students.flatMap(s => s.subjects.map(sub => sub.code)))].sort((a, b) => a - b);
+  return students.map(s => {
+    const row = {
+      roll_no: s.roll,
+      name: s.name,
+      gender: s.gender,
+      result: s.resultStatus,
+      stream: detectedClass === 12 ? (s.stream || '-') : '-',
+      subjects_count: s.subjects.length,
+      subject_codes: s.subjects.map(sub => sub.code).join(' '),
+      total_marks_obtained: s.allTotal,
+      all_percentage: s.allPct,
+      best5_total: s.bestTotal,
+      best5_percentage: s.bestPct,
+      internal_grades: (s.internalGrades || []).join(' '),
+      compartment_subjects: (s.compSubjects || []).join(' '),
+      raw_record_line: s.rawRecordLine || '',
+      raw_marks_line: s.rawMarksLine || ''
+    };
+
+    const subByCode = new Map(s.subjects.map(sub => [sub.code, sub]));
+    codes.forEach(code => {
+      const sub = subByCode.get(code);
+      row[`sub_${code}_marks`] = sub && Number.isInteger(sub.marks) ? sub.marks : '';
+    });
+
+    return row;
+  });
+}
+
+function buildSubjectCodeMasterRows(students, classLevel) {
+  const codes = [...new Set(students.flatMap(s => s.subjects.map(sub => sub.code)))].sort((a, b) => a - b);
+  return codes.map(code => ({
+    subject_code: code,
+    subject_name: SUBJECTS[classLevel]?.[code] || `Unknown (${code})`
+  }));
+}
+
 function isExcludedVocationalForBest5(code) {
   return Number.isInteger(code) && code >= 400 && code <= 499;
 }
@@ -573,6 +614,13 @@ function formatResultStatus(status) {
   return s;
 }
 
+function formatGenderLabel(gender) {
+  const g = String(gender || '').toUpperCase();
+  if (g === 'M') return 'Male ♂';
+  if (g === 'F') return 'Female ♀';
+  return g || 'Other';
+}
+
 function getBest5Stats(student, includeVocational) {
   const marks = student.subjects
     .filter(sub => Number.isInteger(sub.marks) && (includeVocational || !isExcludedVocationalForBest5(sub.code)))
@@ -591,6 +639,7 @@ function getBest5Stats(student, includeVocational) {
 function computeDerived() {
   const p = state.parsed;
   const subMap = new Map(), bucket = {}, gradeDist = {};
+  const genderMap = new Map();
 
   p.students.forEach(s => {
     const best = getBest5Stats(s, state.includeVocationalInBest5);
@@ -600,6 +649,16 @@ function computeDerived() {
 
   p.students.forEach(s => {
     bucket[s.resultStatus] = (bucket[s.resultStatus] || 0) + 1;
+
+    const gender = (s.gender || 'OTHER').toUpperCase();
+    if (!genderMap.has(gender))
+      genderMap.set(gender, { gender, total: 0, appeared: 0, pass: 0, passPct: 0 });
+    const g = genderMap.get(gender);
+    g.total += 1;
+    const isAbsent = s.resultStatus === 'ABST' || s.resultStatus === 'ABSENT';
+    if (!isAbsent) g.appeared += 1;
+    if (s.resultStatus === 'PASS') g.pass += 1;
+
     s.subjects.forEach(sub => {
       if (!subMap.has(sub.code)) subMap.set(sub.code, { code: sub.code, name: sub.name, marks: [] });
       if (Number.isInteger(sub.marks)) subMap.get(sub.code).marks.push(sub.marks);
@@ -616,6 +675,17 @@ function computeDerived() {
 
   state.resultBuckets    = bucket;
   state.gradeDistribution= gradeDist;
+  const genderOrder = ['M', 'F'];
+  state.genderStats = Array.from(genderMap.values())
+    .map(g => ({ ...g, passPct: g.appeared ? +((g.pass / g.appeared) * 100).toFixed(2) : 0 }))
+    .sort((a, b) => {
+      const ai = genderOrder.indexOf(a.gender);
+      const bi = genderOrder.indexOf(b.gender);
+      const av = ai === -1 ? 99 : ai;
+      const bv = bi === -1 ? 99 : bi;
+      if (av !== bv) return av - bv;
+      return a.gender.localeCompare(b.gender);
+    });
 
   const pass = p.students.filter(s => s.resultStatus === 'PASS');
   const byAll  = arr => [...arr].sort((a, b) => (b.allPct  || 0) - (a.allPct  || 0) || (b.allTotal  || 0) - (a.allTotal  || 0) || a.roll.localeCompare(b.roll));
@@ -653,12 +723,15 @@ function renderAll() {
   const metaEl = document.getElementById('meta');
   const schoolLabel = `${p.schoolName}${p.schoolCode ? ' (' + p.schoolCode + ')' : ''}`;
   const schoolColor = p.detectedClass === 10 ? '#1d4ed8' : '#dc2626';
-  metaEl.innerHTML = `<span style="color:${schoolColor};font-weight:700">${schoolLabel}</span> | ${p.examDate} | Region: ${p.region}`;
+  metaEl.innerHTML = `<span style="color:${schoolColor};font-weight:700;font-size:2em">${schoolLabel}</span> | ${p.examDate} | Region: ${p.region}`;
 
   /* KPIs */
+  const appeared = Math.max(0, (p.totals.candidates || 0) - (p.totals.absent || 0));
+  const passPct = appeared ? (((p.totals.pass || 0) / appeared) * 100).toFixed(2) + '%' : '0.00%';
   document.getElementById('kpis').innerHTML = [
     ['Total Candidates', p.totals.candidates, ''],
     ['Pass',             p.totals.pass,            'kpass'],
+    ['Pass %',           passPct,                  'kpasspct'],
     ['Compartment',      p.totals.comp,             'kcomp'],
     ['Essential Repeat', p.totals.essentialRepeat,  'ker'],
     ['Absent',           p.totals.absent,           'kabs']
@@ -675,6 +748,14 @@ function renderAll() {
   renderTable('tTopBest', ['#', 'Roll', 'Name', 'Best 5 %', 'Total'],state.topBest.map((s, i) => [i+1, s.roll, s.name, s.bestPct, s.bestTotal]));
   renderTable('tSubject', ['Code','Subject','Students','Avg','High','Low'],
     state.subjectSummary.map(s => [s.code, s.name, s.students, s.avg, s.high, s.low]));
+  renderTable('tGender', ['Gender', 'Total', 'Appeared', 'Pass', 'Pass %'],
+    state.genderStats.map(g => [
+      formatGenderLabel(g.gender),
+      g.total,
+      g.appeared,
+      g.pass,
+      g.passPct
+    ]));
 
   const hasStream = p.detectedClass === 12;
   const markCols = buildSubjectMarkColumns(p.students);
@@ -739,7 +820,7 @@ function renderStreamSection() {
 
   tabsEl.innerHTML = active.map((k, i) =>
     `<button class="tb ${STREAMS[k].cls} ${i === 0 ? 'act' : ''}" onclick="switchTab('${k}',this)">
-      ${STREAMS[k].label} (${sd[k].total})
+      <span class="tab-icon" aria-hidden="true">${STREAMS[k].icon}</span>${STREAMS[k].label} (${sd[k].total})
     </button>`
   ).join('');
 
@@ -832,7 +913,7 @@ function renderTable(id, headers, rows) {
 function exportExcel() {
   const p  = state.parsed;
   const wb = XLSX.utils.book_new();
-  const exportFooter = "Powerd by SUBBIAH's CBSE RESULT ANALYSER 2026";
+  const exportFooter = "Powered by SUBBIAH's CBSE RESULT ANALYSER 2026";
 
   /* Summary sheet */
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
@@ -852,25 +933,43 @@ function exportExcel() {
     ['Total Absent',         p.totals.absent]
   ]), 'Summary');
 
-  /* Student Master */
+  /* Student Master (same as dashboard table) */
+  const hasStream = p.detectedClass === 12;
+  const markCols = buildSubjectMarkColumns(p.students);
+  const studentMasterHeaders = ['Roll', 'Name', 'Gender', 'Result', ...(hasStream ? ['Stream'] : []), ...markCols.headers, 'All %', 'Best 5 %'];
+  const studentMasterRows = p.students.map(s => [
+    s.roll,
+    s.name,
+    s.gender,
+    s.resultStatus,
+    ...(hasStream ? [s.stream || '-'] : []),
+    ...markCols.valuesForStudent(s),
+    s.allPct ?? '',
+    s.bestPct ?? ''
+  ]);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([
+    studentMasterHeaders,
+    ...studentMasterRows
+  ]), 'Student Master');
+
+  /* Subject Code Master */
   XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(
-    p.students.map(s => ({
-      roll_no:          s.roll,
-      name:             s.name,
-      gender:           s.gender,
-      result:           s.resultStatus,
-      stream:           p.detectedClass === 12 ? (s.stream || '-') : '-',
-      subject_codes:    s.subjects.map(x => x.code).join(' '),
-      all_total:        s.allTotal,
-      all_percentage:   s.allPct,
-      best5_total:      s.bestTotal,
-      best5_percentage: s.bestPct
-    }))
-  ), 'Student Master');
+    buildSubjectCodeMasterRows(p.students, p.detectedClass)
+  ), 'Subject Code Master');
 
   /* Subject Summary */
   XLSX.utils.book_append_sheet(wb,
     XLSX.utils.json_to_sheet(state.subjectSummary), 'Subject Summary');
+
+  /* Gender Summary */
+  XLSX.utils.book_append_sheet(wb,
+    XLSX.utils.json_to_sheet(state.genderStats.map(g => ({
+      gender: formatGenderLabel(g.gender),
+      total: g.total,
+      appeared: g.appeared,
+      pass: g.pass,
+      pass_percentage: g.passPct
+    }))), 'Gender Summary');
 
   /* Top 10 Overall */
   XLSX.utils.book_append_sheet(wb,
@@ -932,7 +1031,7 @@ async function exportPdf() {
   const p   = state.parsed;
   const PW  = 515;  /* printable width */
   const MARGIN_X = 40;
-  const exportFooter = "Powered by SUBBIAH's CBSE RESULT ANALYSER 2026";
+  const exportFooter = "Powerd by SUBBIAH's CBSE RESULT ANALYSER 2026";
 
   const ensurePageSpace = (needed = 90) => {
     const pageHeight = doc.internal.pageSize.getHeight();
@@ -1019,6 +1118,21 @@ async function exportPdf() {
     theme: 'striped',
     styles: { fontSize: 9 },
     headStyles: { fillColor: [29, 78, 216] }
+  });
+
+  doc.autoTable({
+    startY: doc.lastAutoTable.finalY + 10,
+    head:  [['Gender', 'Total', 'Appeared', 'Pass', 'Pass %']],
+    body:  state.genderStats.map(g => [
+      formatGenderLabel(g.gender),
+      g.total,
+      g.appeared,
+      g.pass,
+      `${g.passPct}%`
+    ]),
+    theme: 'grid',
+    styles: { fontSize: 9 },
+    headStyles: { fillColor: [71, 85, 105] }
   });
 
   /* Subject Summary */
